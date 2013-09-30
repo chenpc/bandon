@@ -8,11 +8,9 @@
 
 <form action="{% url 'menu:start_order' %}" method="post">
 {% csrf_token %}
-<input type="hidden" name="menu_pk" value="{{buy.get_menu.pk}}">
+<input type="hidden" name="buy_pk" value="{{buy.pk}}">
 {% for dish in buy.get_menu.dish_set.all %}
 	<input type="radio" name="dish" value="{{ dish.pk }}" />{{ dish.dish_name }} : {{ dish.price }} <br/>
 {% endfor %}
-
-<p>訂購者<input type="text" name="issue_user"/></p>
 <input type="submit" value="Order" />
 </form>

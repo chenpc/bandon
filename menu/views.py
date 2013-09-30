@@ -6,8 +6,9 @@ from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
-from menu.models import Menu, Dish, Buy, Order
+from menu.models import Menu, Dish, Buy, Order, Money
 import datetime
+from django.utils import timezone
 from django import forms
 class Buy_Form(forms.Form):
     start_time = forms.DateTimeField(initial=datetime.datetime.now())
@@ -21,7 +22,15 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         """Return the last five published polls."""
         return Menu.objects.all()
-    
+        
+class OrderView(generic.ListView):
+    template_name = 'menu/order.html'
+    context_object_name = 'latest_order_list'
+                
+    def get_queryset(self):
+        """Return the last five published polls."""
+        return Order.objects.all()
+      
 class DetailView(generic.DetailView):
     model = Menu
     template_name = 'menu/detail.html'
@@ -67,8 +76,27 @@ def start_buy(request):
     
     return HttpResponseRedirect(reverse('index'))
 
-def start_order(request):
-    print request.POST['menu_pk']
-    print request.POST['dish']
-    print request.POST['issue_user']
+def start_order(request):    
+    buy = Buy.objects.get(pk=int(request.POST['buy_pk']))
+    order = buy.order_set.create()
+    order.buyer = request.user.pk
+    order.dish_id = int(request.POST['dish'])
+    dish = Dish.objects.get(pk=order.dish_id)
+    try:
+        money = Money.objects.get(user=request.user.pk)
+    except Money.DoesNotExist:
+        money = request.user.money_set.create()
+        money.total = 0
+        money.save()
+        
+    money.total = money.total - dish.price
+    money.save()
+    order.save()
+    return HttpResponseRedirect(reverse('index'))
+
+def del_order(request, order_pk):    
+    order = Order.objects.get(pk=order_pk)
+    print 
+    if request.user.pk == order.buyer and order.buy.end_date > timezone.now():
+        order.delete()    
     return HttpResponseRedirect(reverse('index'))

@@ -27,6 +27,8 @@ class Buy(models.Model):
         return Menu.objects.get(pk=self.menu_id)
     def get_issuer(self):
         return User.objects.get(pk=self.issue_user).username
+    def get_user_order(self, user_id):
+        return self.order_set.get(buyer=user_id)
 
     
 class Order(models.Model):
@@ -36,3 +38,11 @@ class Order(models.Model):
     count = models.IntegerField(default=0)
     comment =  models.CharField(max_length=200)
     cost = models.IntegerField(default=0)
+    def get_dish(self):
+        return Dish.objects.get(pk=self.dish_id)
+
+class Money(models.Model):
+    user = models.ForeignKey(User)
+    total = models.IntegerField(default=0)
+
+        

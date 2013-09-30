@@ -1,0 +1,16 @@
+{% load staticfiles %}
+{% load url from future %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'menu/style.css' %}" />
+
+
+{% if latest_order_list %}
+    <ul>
+    {% for order in latest_order_list %}
+    
+        <li>{{ order.buy.get_menu }} {{ order.get_dish }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Order are available.</p>
+{% endif %}

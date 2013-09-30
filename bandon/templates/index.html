@@ -4,10 +4,19 @@
 <link rel="stylesheet" type="text/css" href="{% static 'menu/style.css' %}" />
 <a href="{% url 'menu:index' %}">Menu</a> <a href="{% url 'logout' %}">Logout</a>
 <br/>
+結餘：<{{ money.total }}>
 {% if latest_buy_list %}
     <ul>
     {% for buy in latest_buy_list %}    
-        <li><a href="{% url 'menu:buy' buy.menu_id %}">{{buy.get_menu}}</a> by: {{buy.get_issuer}} <br/> {{buy.start_date|date:"Y-m-d H:i"}} </li>
+        <li><a href="{% url 'menu:buy' buy.pk %}">{{buy.get_menu}}</a> by: {{buy.get_issuer}}
+        
+        {% for order in buy.order_set.all %}
+	        {% if user.pk == order.buyer %}        
+	        	{{ order.get_dish }} [<a href="{% url 'menu:del_order' order.pk %}">X</a>]        
+	        {% endif %}
+        {% endfor %} 
+        
+        <br/> {{buy.end_date|date:"Y-m-d H:i"}} </li>
     {% endfor %}
     </ul>
 {% else %}

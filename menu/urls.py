@@ -4,6 +4,8 @@ from menu import views
 
 urlpatterns = patterns('',
     url(r'^$', login_required(views.IndexView.as_view()), name='index'),
+    url(r'^order$', login_required(views.OrderView.as_view()), name='order'),
+     url(r'^(?P<order_pk>\d+)/del_order', login_required(views.del_order), name='del_order'),
     url(r'^add_menu$', login_required(views.add_menu), name='add_menu'),
     url(r'^start_buy$', login_required(views.start_buy), name='start_buy'),
     url(r'^(?P<pk>\d+)/$', login_required(views.DetailView.as_view()), name='detail'),
