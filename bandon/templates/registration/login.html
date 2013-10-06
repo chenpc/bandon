@@ -1,5 +1,8 @@
 {% extends "base.html" %}
-{% load url from future %}
+
+{% block sidebar %}
+<td><a href="{% url 'register' %}">Register</a></td>
+{% endblock %}
 
 {% block content %}
 

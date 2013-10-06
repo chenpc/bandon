@@ -1,7 +1,8 @@
-{% load url from future %}
-<h1>{{ menu.store_name }} : TEL {{ menu.tele_num }}</h1>
+{% extends "base.html" %}
 {% load tz %}
 
+{% block content %}
+<h1>{{ menu.store_name }} : TEL {{ menu.tele_num }}</h1>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 {% for dish in menu.dish_set.all %}
@@ -15,3 +16,4 @@
 <p>結束時間<input type="datetime" name="end_time" value="{% now "Y-m-d H:i" %}"/></p>
 <input type="submit" value="開始團購" />
 </form>
+{% endblock %}

@@ -1,18 +1,9 @@
+{% extends "base.html" %}
 {% load staticfiles %}
-{% load url from future %}
-
-<link rel="stylesheet" type="text/css" href="{% static 'menu/style.css' %}" />
-
-
-<form action="{% url 'menu:add_menu' %}" method="post">
-{% csrf_token %}
-<textarea name="menu_text" value=""> </textarea>
-<br/>
-<input type="submit" value="Add to Menu" />
-</form>
 
 
 
+{% block content %}
 {% if latest_menu_list %}
     <ul>
     {% for menu in latest_menu_list %}
@@ -23,3 +14,11 @@
 {% else %}
     <p>No Menu are available.</p>
 {% endif %}
+
+<form action="{% url 'menu:add_menu' %}" method="post">
+{% csrf_token %}
+<textarea name="menu_text" value=""> </textarea>
+<br/>
+<input type="submit" value="Add to Menu" />
+</form>
+{% endblock %}

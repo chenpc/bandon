@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<form method="post" action="{% url 'adduser' %}">
+{% csrf_token %}
+<table>
+    <tr>Username :<input type="text" name="name" /></tr><br/>
+    <tr>e-mail :<input type="text" name="mail" /></tr><br/>
+    <tr>Password :<input type="password" name="pwd1" /></tr><br/>
+    <tr>Re-type Password :<input type="password" name="pwd2" /></tr><br/>
+</table>
+
+<input type="submit" value="Create" />
+<input type="hidden" name="next" value="{{ next }}" />
+</form>
+
+{% endblock %}

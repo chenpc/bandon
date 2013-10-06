@@ -1,18 +1,25 @@
+{% load url from future %}
 <!DOCTYPE html>
 <html lang="utf-8">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link rel="stylesheet" href="style.css" />
-    <title>{% block title %}My amazing site{% endblock %}</title>
+    <title>{% block title %}QNAP訂便當{% endblock %}</title>
 </head>
 
 <body>
     <div id="sidebar">
-        {% block sidebar %}
-        <ul>
-            <li><a href="/">Home</a></li>            
-        </ul>
-        {% endblock %}
+    	<table>
+    	<td><a href="/">Home</a></td>
+    	<td><a href="{% url 'menu:index' %}">Menu</a></td>
+    	{% if user.is_authenticated %}
+		<td><a href="{% url 'logout' %}">Logout</a></td>
+		{% endif %}
+		{% if money %}
+		<td> 殘金：{{ money.total }}</td>
+		{% endif %}
+		{% block sidebar %}{% endblock %}
+		</table>
     </div>
 
     <div id="content">        

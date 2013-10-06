@@ -90,13 +90,17 @@ def start_order(request):
         money.save()
         
     money.total = money.total - dish.price
+    order.cost = dish.price
     money.save()
     order.save()
     return HttpResponseRedirect(reverse('index'))
 
 def del_order(request, order_pk):    
     order = Order.objects.get(pk=order_pk)
-    print 
+    money = Money.objects.get(user=order.buyer)  
     if request.user.pk == order.buyer and order.buy.end_date > timezone.now():
-        order.delete()    
+        print order.cost
+        order.delete()
+        money.total = money.total + order.cost
+        money.save()    
     return HttpResponseRedirect(reverse('index'))

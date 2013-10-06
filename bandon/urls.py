@@ -21,4 +21,6 @@ urlpatterns = patterns('',
     url(r'^menu/', include('menu.urls', namespace="menu")),
     url(r'^accounts/login/$', 'django.contrib.auth.views.login'),
     url(r'^accounts/out/$', views.logout_view, name = "logout"),
+    url(r'^accounts/register/$', views.RegisterView.as_view(), name = "register"),
+    url(r'^accounts/adduser/$', views.adduser, name = "adduser"),
 )
