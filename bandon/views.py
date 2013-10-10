@@ -5,6 +5,13 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
+class UserView(generic.ListView):
+    template_name = 'users.html'
+    context_object_name = 'user_list'              
+    def get_queryset(self):
+        """Return the last five published polls."""
+        return User.objects.all()
+    
 class IndexView(generic.ListView):
     template_name = 'index.html'
     context_object_name = 'latest_buy_list'              
@@ -47,9 +54,4 @@ def adduser(request):
             money = user.money_set.create()
             money.total = 0
             money.save()
-    
-    
-        
-       
-    
     return HttpResponseRedirect(reverse('index'))
