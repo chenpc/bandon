@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -29,6 +30,8 @@ class Buy(models.Model):
         return User.objects.get(pk=self.issue_user).username
     def get_user_order(self, user_id):
         return self.order_set.get(buyer=user_id)
+    def __unicode__(self):
+        return Menu.objects.get(pk=self.menu_id).store_name + " End Time " +self.end_date.__str__()
 
     
 class Order(models.Model):
@@ -40,9 +43,13 @@ class Order(models.Model):
     cost = models.IntegerField(default=0)
     def get_dish(self):
         return Dish.objects.get(pk=self.dish_id)
+    def __unicode__(self):
+        return str(self.pk) + " " + User.objects.get(pk=self.buyer).username + " " + self.buy.__unicode__()+ " " + Dish.objects.get(pk=self.dish_id).dish_name
 
 class Money(models.Model):
     user = models.ForeignKey(User)
     total = models.IntegerField(default=0)
+    def __unicode__(self):
+        return str(self.user.pk) + " " + self.user.username
 
         

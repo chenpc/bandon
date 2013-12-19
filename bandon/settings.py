@@ -7,7 +7,7 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
-PROJ_DIR="/Users/chenpc/code"
+PROJ_DIR="/Users/chenpc/git/"
 
 MANAGERS = ADMINS
 
