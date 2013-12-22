@@ -1,9 +1,7 @@
-{% load url from future %}
+{% extends "base.html" %}
 <h1>{{ buy.get_menu.store_name }} : TEL {{ buy.get_menu.tele_num }}</h1>
 {% load tz %}
-
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
+{% block content %}
 
 
 <form action="{% url 'menu:start_order' %}" method="post">
@@ -14,3 +12,4 @@
 {% endfor %}
 <input type="submit" value="Order" />
 </form>
+{% endblock %}

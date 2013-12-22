@@ -24,4 +24,5 @@ urlpatterns = patterns('',
     url(r'^accounts/register/$', views.RegisterView.as_view(), name = "register"),
     url(r'^accounts/adduser/$', views.adduser, name = "adduser"),
     url(r'^accounts/admin/$', views.adduser, name = "manage_user"),
+    url(r'^recharge/$', views.RechargeView.as_view(), name = "recharge"),
 )

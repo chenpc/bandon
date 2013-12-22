@@ -1,9 +1,7 @@
+{% extends "base.html" %}
 {% load staticfiles %}
 {% load url from future %}
-
-<link rel="stylesheet" type="text/css" href="{% static 'menu/style.css' %}" />
-
-
+{% block content %}
 {% if latest_order_list %}
     <ul>
     {% for order in latest_order_list %}
@@ -14,3 +12,4 @@
 {% else %}
     <p>No Order are available.</p>
 {% endif %}
+{% endblock %}

@@ -1,5 +1,6 @@
 {% load url from future %}
 {% load staticfiles %}
+{% load tz %}
 <!DOCTYPE html>
 <html lang="utf-8">
 <head>
@@ -16,16 +17,17 @@
     	{% if user.is_authenticated %}
 		<td><a href="{% url 'logout' %}">Logout</a></td>
 		{% endif %}
-        {% if user.is_staff %}
+		{% if user.is_staff %}
         <td><a href="/admin/">Admin</a></td>
+        <td><a href="/recharge">Recharge</a></td>
         {% endif %} 
-		{% if money %}
-		<td> 殘金：{{ money.total }}</td>
-		{% endif %}
 		{% block sidebar %}{% endblock %}
 		</table>
+		{% if money %}
+			<td> {{ money.user }} 殘金：[{{ money.total }}]</td>
+		{% endif %}
     </div>
-
+   
     <div id="content">        
         {% block content %}{% endblock %}
     </div>

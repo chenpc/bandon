@@ -33,7 +33,13 @@ class IndexView(generic.ListView):
         return context
 
 class RegisterView(generic.TemplateView):
-    template_name = 'registration/register.html'               
+    template_name = 'registration/register.html'
+    
+class RechargeView(generic.ListView):
+    template_name = 'recharge.html'
+    context_object_name = 'all_money_list'
+    def get_queryset(self):
+        return Money.objects.all()
         
 def logout_view(request):    
     logout(request)

@@ -39,6 +39,10 @@ class BuyView(generic.DetailView):
     model = Buy
     template_name = 'menu/buy.html'
 
+class BuyListView(generic.DetailView):
+    model = Buy
+    template_name = 'menu/buy_list.html'
+
     
 def add_menu(request):    
     menu_text = request.POST['menu_text']    
@@ -60,7 +64,7 @@ def add_menu(request):
     menu.tele_num = tele_num
     for item in item_list.splitlines():
         item_name = item.split(", ")
-        if len(item_name) == 2:
+        if len(item_name) == 2:            
             menu.dish_set.create(dish_name=item_name[0], price=int(item_name[1]))            
     menu.save()
     return HttpResponseRedirect(reverse('menu:index'))
@@ -76,6 +80,13 @@ def start_buy(request):
     
     return HttpResponseRedirect(reverse('index'))
 
+def change_money(request):
+    money = Money.objects.get(user=request.user.pk)
+    print request.POST['change_money']
+    money.total = money.total + int(request.POST['change_money'])
+    money.save()
+    return HttpResponseRedirect(reverse('recharge'))
+    
 def start_order(request):    
     buy = Buy.objects.get(pk=int(request.POST['buy_pk']))
     order = buy.order_set.create()

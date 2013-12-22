@@ -28,8 +28,17 @@ class Buy(models.Model):
         return Menu.objects.get(pk=self.menu_id)
     def get_issuer(self):
         return User.objects.get(pk=self.issue_user).username
-    def get_user_order(self, user_id):
-        return self.order_set.get(buyer=user_id)
+    def orderlist(self):
+        olist = dict()        
+        for order in self.order_set.all():            
+            if order.get_dish() in olist:
+                (count, name) = olist[order.get_dish()]                
+                olist[order.get_dish()] = (count+1, name + ", " + order.get_buyer().username)
+            else:
+                olist[order.get_dish()] = (1, order.get_buyer().username)
+
+            
+        return olist
     def __unicode__(self):
         return Menu.objects.get(pk=self.menu_id).store_name + " End Time " +self.end_date.__str__()
 
@@ -43,6 +52,8 @@ class Order(models.Model):
     cost = models.IntegerField(default=0)
     def get_dish(self):
         return Dish.objects.get(pk=self.dish_id)
+    def get_buyer(self):
+        return User.objects.get(pk=self.buyer)
     def __unicode__(self):
         return str(self.pk) + " " + User.objects.get(pk=self.buyer).username + " " + self.buy.__unicode__()+ " " + Dish.objects.get(pk=self.dish_id).dish_name
 
@@ -51,5 +62,3 @@ class Money(models.Model):
     total = models.IntegerField(default=0)
     def __unicode__(self):
         return str(self.user.pk) + " " + self.user.username
-
-        

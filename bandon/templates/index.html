@@ -2,26 +2,26 @@
 
 {% block content %}
 {% if latest_buy_list %}
-    
+<table frame="border" rules="all">  
     {% for buy in latest_buy_list %}    	    
-        <div>        
         
-        <span>
-        <a href="{% url 'menu:buy' buy.pk %}">{{buy.get_menu}}</a>
-        <a href="{% url 'menu:buy' buy.pk %}">我要訂</a>        
+        <tr>
+        <td><a href="{% url 'menu:buy_list' buy.pk %}">{{buy.get_menu}}</a></td>
+        <td><a href="{% url 'menu:buy' buy.pk %}">我要訂</a></td>
+        <td>        
         {% for order in buy.order_set.all %}
 	        {% if user.pk == order.buyer %}        
-	        	{{ order.get_dish }} <a href="{% url 'menu:del_order' order.pk %}">X</a>        
+	        	{{ order.get_dish }} <a href="{% url 'menu:del_order' order.pk %}">X</a>       
 	        {% endif %}
         {% endfor %}
-        </span>
+        </td>        
         
-        <span>發起人: {{buy.get_issuer}}</span>
-        <span>截止時間：{{buy.end_date|date:"Y-m-d H:i"}}</span>
-                
-        </div>
+        <td>發起人: {{buy.get_issuer}}</td>
+		<td>截止日期 {{buy.end_date|date:"Y-m-d H:i"}}</td>
+		</tr>
+       
     {% endfor %}
-    
+</table>   
 {% else %}
     <p>No Menu are available.</p>
 {% endif %}
