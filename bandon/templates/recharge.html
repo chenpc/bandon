@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load tz %}
+
+{% block content %}
+{% if all_money_list %}
+    <ul>
+    {% for money in all_money_list %}
+    <li><form action="{% url 'menu:change_money' %}" method="post">
+		{% csrf_token %}
+		{{money.user}} => {{money.total}}  (+/-) :
+		<input type="text" name="change_money" value="0">		
+		<input type="submit" value="Order" />
+	</form>
+	</li>
+        
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Money are available.</p>
+{% endif %}
+
+{% endblock %}
