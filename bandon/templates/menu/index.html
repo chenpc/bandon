@@ -4,8 +4,7 @@
 {% block content %}
 {% if latest_menu_list %}
     <ul>
-    {% for menu in latest_menu_list %}
-    
+    {% for menu in latest_menu_list %}    
         <li><a href="{% url 'menu:detail' menu.id %}">{{ menu.store_name }}</a></li>
     {% endfor %}
     </ul>

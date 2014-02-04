@@ -12,8 +12,8 @@
 <form action="{% url 'menu:start_buy' %}" method="post">
 {% csrf_token %}
 <input type="hidden" name="menu_pk" value="{{menu.pk}}">
-<p>開始時間<input type="datetime" name="start_time" value="{% now "Y-m-d H:i" %}" id="start_time"/></p>
-<p>結束時間<input type="datetime" name="end_time" value="{% now "Y-m-d H:i" %}" id="end_time"/></p>
+<p>截止時間<input type="datetime" name="end_time" value="{% now "m/d/Y" %}" id="end_time"/></p>
+<p>午餐 <input type="radio" name="type" value="launch" checked/> 晚餐 <input type="radio" name="type" value="dinner"/></p>
 <input type="submit" value="開始團購" />
 </form>
 {% endblock %}

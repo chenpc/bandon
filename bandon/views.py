@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 import datetime
+from django.utils import timezone
 
 class UserView(generic.ListView):
     template_name = 'users.html'
@@ -18,7 +19,7 @@ class IndexView(generic.ListView):
     context_object_name = 'latest_buy_list'              
     def get_queryset(self):
         """Return the last five published polls."""
-        return Buy.objects.exclude(end_date__lt = datetime.datetime.now()).order_by('end_date')[:14]
+        return Buy.objects.exclude(end_date__lt = timezone.now()).order_by('end_date')[:14]
     
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context

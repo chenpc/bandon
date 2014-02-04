@@ -18,13 +18,13 @@
         <td>        
         {% for order in buy.order_set.all %}
 	        {% if user.pk == order.buyer %}        
-	        	{{ order.get_dish }} <a href="{% url 'menu:del_order' order.pk %}">X</a>       
+	        	{{ order.get_dish }}[{{ order.get_dish.price }}] <a href="{% url 'menu:del_order' order.pk %}">X</a>       
 	        {% endif %}
         {% endfor %}
         </td>        
         
-        <td>{{buy.get_issuer}}</td>
-		<td>{{buy.end_date|date:"Y-m-d H:i l"}}
+        <td>{{ buy.get_issuer }}</td>
+		<td>{{ buy.end_date|date:"Y-m-d H:i l" }}
 		</td>
 		</tr>
        

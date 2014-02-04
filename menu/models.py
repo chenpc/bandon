@@ -24,6 +24,7 @@ class Buy(models.Model):
     start_date = models.DateTimeField('start order')
     end_date = models.DateTimeField('end order')
     menu_id = models.IntegerField(default=0)
+    discount = models.IntegerField(default=0)
     def get_menu(self):
         return Menu.objects.get(pk=self.menu_id)
     def get_issuer(self):

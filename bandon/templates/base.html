@@ -7,25 +7,35 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link rel="stylesheet" href="{% static 'style.css' %}" />
     <title>{% block title %}QNAP訂便當{% endblock %}</title>
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+	<link rel="stylesheet" href="/resources/demos/style.css">
+	<script>
+		$(function() {		
+		$( "#end_time" ).datepicker();
+		});
+	</script>
 </head>
 
 <body>
     <div id="sidebar">
     	<table>
-    	<td><a href="/">Home</a></td>
-    	<td><a href="{% url 'menu:index' %}">Menu</a></td>
+    	<td><a href="/">首頁</a></td>
+    	<td><a href="{% url 'menu:index' %}">菜單</a></td>
     	{% if user.is_authenticated %}
-		<td><a href="{% url 'logout' %}">Logout</a></td>
+		<td><a href="{% url 'logout' %}">登出</a></td>
 		{% endif %}
+		<td><a href="{% url 'history' %}">歷史記錄</a></td>
 		{% if user.is_staff %}
-        <td><a href="/admin/">Admin</a></td>
-        <td><a href="/recharge">Recharge</a></td>
+	       <td><a href="/admin/">[管理者]</a></td>
+	       <td><a href="/recharge">[儲值]</a></td>
         {% endif %} 
-        <td><a href="{% url 'history' %}">History</a></td>
+        
 		{% block sidebar %}{% endblock %}
 		</table>
 		{% if money %}
-			<td> {{ money.user }} 殘料：[{{ money.total }}]</td>
+			<td> {{ money.user }} 餘額：[{{ money.total }}]</td>
 		{% endif %}
     </div>
    

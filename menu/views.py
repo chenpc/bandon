@@ -11,8 +11,8 @@ import datetime
 from django.utils import timezone
 from django import forms
 class Buy_Form(forms.Form):
-    start_time = forms.DateTimeField(initial=datetime.datetime.now())
-    end_time = forms.DateTimeField(initial=datetime.datetime.now())
+    start_time = forms.DateTimeField(initial=timezone.now())
+    end_time = forms.DateTimeField(initial=timezone.now())
 
 
 class IndexView(generic.ListView):
@@ -71,13 +71,20 @@ def add_menu(request):
 
 
 def start_buy(request):
-    buy = Buy.objects.create(start_date=datetime.datetime.strptime(request.POST['start_time'], "%Y-%m-%d %H:%M"),
-                              end_date=datetime.datetime.strptime(request.POST['end_time'], "%Y-%m-%d %H:%M"))
+    type = request.POST['type']
+    if type == "launch":
+        df = datetime.timedelta(hours=10)
+    else:
+        df = datetime.timedelta(hours=15)       
+    buy = Buy.objects.create(start_date=timezone.now(),
+        end_date=timezone.make_aware(datetime.datetime.strptime(request.POST['end_time'], "%m/%d/%Y")+df, timezone.get_current_timezone()))
+    
+    if type == "dinner":  
+        buy.discount = 80 # by QNAP
+           
     buy.menu_id = int(request.POST['menu_pk'])
     buy.issue_user = User.objects.get(username__exact=request.user.username).pk
-    print buy.issue_user
-    buy.save()
-    
+    buy.save()    
     return HttpResponseRedirect(reverse('index'))
 
 def change_money(request):
@@ -100,18 +107,48 @@ def start_order(request):
         money.total = 0
         money.save()
         
-    money.total = money.total - dish.price
-    order.cost = dish.price
+    order_list = Order.objects.filter(buyer=order.buyer)
+    total_cost = 0    
+    for entry in order_list:
+        tmp_dish = Dish.objects.get(pk=entry.dish_id) 
+        total_cost = total_cost + tmp_dish.price
+    print total_cost
+    
+    if total_cost - buy.discount >= 0:
+        cost = dish.price
+    else:
+        cost = dish.price - buy.discount + total_cost        
+    
+    if cost < 0:
+        cost = 0  
+    money.total = money.total - cost
+    order.cost = cost
     money.save()
     order.save()
     return HttpResponseRedirect(reverse('index'))
 
 def del_order(request, order_pk):    
     order = Order.objects.get(pk=order_pk)
+    tmp_dish = Dish.objects.get(pk=order.dish_id)
+    return_cost = tmp_dish.price - order.cost
     money = Money.objects.get(user=order.buyer)  
     if request.user.pk == order.buyer and order.buy.end_date > timezone.now():
-        print order.cost
-        order.delete()
+        tmp_buyer = order.buyer
         money.total = money.total + order.cost
-        money.save()    
+        order.delete()
+        order_list = Order.objects.filter(buyer=tmp_buyer)
+        
+        for entry in order_list:
+            if entry.cost < return_cost:
+                return_cost = return_cost - entry.cost
+                money.total = money.total + entry.cost
+                entry.cost = 0
+                
+            else:
+                entry.cost = entry.cost - return_cost
+                money.total = money.total + return_cost
+                return_cost = 0
+            entry.save()            
+        
+        money.save()           
     return HttpResponseRedirect(reverse('index'))
