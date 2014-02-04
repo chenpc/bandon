@@ -21,10 +21,11 @@
         <td><a href="/admin/">Admin</a></td>
         <td><a href="/recharge">Recharge</a></td>
         {% endif %} 
+        <td><a href="{% url 'history' %}">History</a></td>
 		{% block sidebar %}{% endblock %}
 		</table>
 		{% if money %}
-			<td> {{ money.user }} 殘金：[{{ money.total }}]</td>
+			<td> {{ money.user }} 殘料：[{{ money.total }}]</td>
 		{% endif %}
     </div>
    

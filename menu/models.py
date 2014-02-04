@@ -29,13 +29,19 @@ class Buy(models.Model):
     def get_issuer(self):
         return User.objects.get(pk=self.issue_user).username
     def orderlist(self):
-        olist = dict()        
+        olist = dict()
+        total = 0
+        total_count = 0        
         for order in self.order_set.all():            
             if order.get_dish() in olist:
                 (count, name) = olist[order.get_dish()]                
-                olist[order.get_dish()] = (count+1, name + ", " + order.get_buyer().username)
+                olist[order.get_dish()] = (count+1, name + ", " + order.get_buyer().username, order.get_dish().price)
             else:
-                olist[order.get_dish()] = (1, order.get_buyer().username)
+                olist[order.get_dish()] = (1, order.get_buyer().username, order.get_dish().price)
+            total = total + order.get_dish().price
+            total_count = total_count + 1
+        olist["Total"] = (total_count, "", total)
+        
 
             
         return olist

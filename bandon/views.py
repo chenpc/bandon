@@ -4,6 +4,7 @@ from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+import datetime
 
 class UserView(generic.ListView):
     template_name = 'users.html'
@@ -17,7 +18,7 @@ class IndexView(generic.ListView):
     context_object_name = 'latest_buy_list'              
     def get_queryset(self):
         """Return the last five published polls."""
-        return Buy.objects.order_by('-end_date')
+        return Buy.objects.exclude(end_date__lt = datetime.datetime.now()).order_by('end_date')[:14]
     
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -31,6 +32,27 @@ class IndexView(generic.ListView):
             money.save()
             context['money'] = money
         return context
+    
+class HistoryView(generic.ListView):
+    template_name = 'history.html'
+    context_object_name = 'latest_buy_list'              
+    def get_queryset(self):
+        """Return the last five published polls."""
+        return Buy.objects.order_by('-end_date')[:100]
+    
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(HistoryView, self).get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        try:
+            context['money'] = self.request.user.money_set.get(user=self.request.user.pk)
+        except Money.DoesNotExist:
+            money = self.request.user.money_set.create()
+            money.total = 0
+            money.save()
+            context['money'] = money
+        return context
+
 
 class RegisterView(generic.TemplateView):
     template_name = 'registration/register.html'

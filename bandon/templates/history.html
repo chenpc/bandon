@@ -5,20 +5,18 @@
 <table frame="border" rules="all">
 <tr>
 <td>店家名稱</td>
-<td>開始訂購</td>
 <td>訂購品項</td>
 <td>發起人</td>
 <td>截止時間</td>
-</tr>    
+</tr>  
     {% for buy in latest_buy_list %}    	    
         
         <tr>
-        <td><a href="{% url 'menu:buy_list' buy.pk %}">{{buy.get_menu}}</a></td>
-        <td><a href="{% url 'menu:buy' buy.pk %}">我要訂</a></td>
+        <td><a href="{% url 'menu:buy_list' buy.pk %}">{{buy.get_menu}}</a></td>        
         <td>        
         {% for order in buy.order_set.all %}
 	        {% if user.pk == order.buyer %}        
-	        	{{ order.get_dish }} <a href="{% url 'menu:del_order' order.pk %}">X</a>       
+	        	{{ order.get_dish }}       
 	        {% endif %}
         {% endfor %}
         </td>        

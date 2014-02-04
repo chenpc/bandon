@@ -7,9 +7,9 @@
     {% for money in all_money_list %}
     <li><form action="{% url 'menu:change_money' %}" method="post">
 		{% csrf_token %}
-		{{money.user}} => {{money.total}}  (+/-) :
+		{{money.user}} : [{{money.total}}]
 		<input type="text" name="change_money" value="0">		
-		<input type="submit" value="Order" />
+		<input type="submit" value="(+/-)" />
 	</form>
 	</li>
         
