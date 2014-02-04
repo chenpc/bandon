@@ -111,8 +111,7 @@ def start_order(request):
     total_cost = 0    
     for entry in order_list:
         tmp_dish = Dish.objects.get(pk=entry.dish_id) 
-        total_cost = total_cost + tmp_dish.price
-    print total_cost
+        total_cost = total_cost + tmp_dish.price    
     
     if total_cost - buy.discount >= 0:
         cost = dish.price

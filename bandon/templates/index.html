@@ -6,7 +6,7 @@
 <tr>
 <td>店家名稱</td>
 <td>開始訂購</td>
-<td>訂購品項</td>
+<td>訂購品項[實扣/原價]</td>
 <td>發起人</td>
 <td>截止時間</td>
 </tr>    
@@ -18,7 +18,7 @@
         <td>        
         {% for order in buy.order_set.all %}
 	        {% if user.pk == order.buyer %}        
-	        	{{ order.get_dish }}[{{ order.get_dish.price }}] <a href="{% url 'menu:del_order' order.pk %}">X</a>       
+	        	{{ order.get_dish }}[{{order.cost}}/{{ order.get_dish.price }}] <a href="{% url 'menu:del_order' order.pk %}">X</a>       
 	        {% endif %}
         {% endfor %}
         </td>        
