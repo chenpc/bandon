@@ -2,6 +2,13 @@
 {% load tz %}
 
 {% block content %}
+<form action="{% url 'menu:start_buy' %}" method="post">
+{% csrf_token %}
+<input type="hidden" name="menu_pk" value="{{menu.pk}}">
+<p>截止時間 : <input type="datetime" name="end_time" value="{% now "m/d/Y" %}" id="end_time"/></p>
+<p>午餐 <input type="radio" name="type" value="launch" checked/> 晚餐(公司補助80元) <input type="radio" name="type" value="dinner"/></p>
+<input type="submit" value="開始團購" />
+</form>
 <h1>{{ menu.store_name }} : TEL {{ menu.tele_num }}</h1>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
@@ -9,11 +16,5 @@
 	<li>{{ dish.dish_name }} : {{dish.price}} </li>	
 {% endfor %}
 
-<form action="{% url 'menu:start_buy' %}" method="post">
-{% csrf_token %}
-<input type="hidden" name="menu_pk" value="{{menu.pk}}">
-<p>截止時間<input type="datetime" name="end_time" value="{% now "m/d/Y" %}" id="end_time"/></p>
-<p>午餐 <input type="radio" name="type" value="launch" checked/> 晚餐(公司補助80元) <input type="radio" name="type" value="dinner"/></p>
-<input type="submit" value="開始團購" />
-</form>
+
 {% endblock %}
