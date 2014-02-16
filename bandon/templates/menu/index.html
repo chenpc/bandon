@@ -5,7 +5,11 @@
 {% if latest_menu_list %}
     <ul>
     {% for menu in latest_menu_list %}    
-        <li><a href="{% url 'menu:detail' menu.id %}">{{ menu.store_name }}</a></li>
+        <li><a href="{% url 'menu:detail' menu.id %}">{{ menu.store_name }}
+        {% if menu.misc %}
+        	({{ menu.misc }})
+        {% endif %}
+        </a></li>
     {% endfor %}
     </ul>
 {% else %}

@@ -48,6 +48,7 @@ def add_menu(request):
     menu_text = request.POST['menu_text']    
     menu_list = menu_text.splitlines()
     store_name = menu_list[0].split(": ")[1]
+    misc = menu_list[1].split(": ")[1]
     tele_num = menu_list[3].split(": ")[1]
     
     item_list = menu_text[menu_text.index(u"產品:")+3:menu_text.index(u"訂購說明:")]
@@ -62,6 +63,7 @@ def add_menu(request):
     
     menu.store_name = store_name
     menu.tele_num = tele_num
+    menu.misc = misc
     for item in item_list.splitlines():
         item_name = item.split(", ")
         if len(item_name) == 2:            

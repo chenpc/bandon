@@ -10,6 +10,7 @@
 <p><input type="radio" name="type" value="dinner"/>晚餐(公司補助80元)</p>
 </form>
 <h1>{{ menu.store_name }} : TEL {{ menu.tele_num }}</h1>
+<h2>{{menu.misc}}</h2>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 {% for dish in menu.dish_set.all %}
