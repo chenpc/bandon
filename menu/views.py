@@ -96,9 +96,12 @@ def change_money(request):
     
 def start_order(request):    
     buy = Buy.objects.get(pk=int(request.POST['buy_pk']))
+    count = int(request.POST['count'])
     order = buy.order_set.create()
     order.buyer = request.user.pk
     order.dish_id = int(request.POST['dish'])
+    order.count = count
+    
     dish = Dish.objects.get(pk=order.dish_id)
     try:
         money = Money.objects.get(user=request.user.pk)
@@ -107,47 +110,47 @@ def start_order(request):
         money.total = 0
         money.save()
         
-    order_list = Order.objects.filter(buyer=order.buyer)
+    order_list = buy.order_set.filter(buyer=order.buyer)
     total_cost = 0    
     for entry in order_list:
         tmp_dish = Dish.objects.get(pk=entry.dish_id) 
-        total_cost = total_cost + tmp_dish.price    
+        total_cost = total_cost + tmp_dish.price * entry.count
     
     if total_cost - buy.discount >= 0:
-        cost = dish.price
+        cost = dish.price * order.count
     else:
-        cost = dish.price - buy.discount + total_cost        
+        cost = dish.price * order.count - (buy.discount - total_cost)
     
     if cost < 0:
         cost = 0  
     money.total = money.total - cost
-    order.cost = cost
+    
     money.save()
     order.save()
     return HttpResponseRedirect(reverse('index'))
 
 def del_order(request, order_pk):    
     order = Order.objects.get(pk=order_pk)
-    tmp_dish = Dish.objects.get(pk=order.dish_id)
-    return_cost = tmp_dish.price - order.cost
+    buy = order.buy
+    dish = Dish.objects.get(pk=order.dish_id)
+    
     money = Money.objects.get(user=order.buyer)  
-    if request.user.pk == order.buyer and order.buy.end_date > timezone.now():
-        tmp_buyer = order.buyer
-        money.total = money.total + order.cost
-        order.delete()
-        order_list = Order.objects.filter(buyer=tmp_buyer)
+    
+    if request.user.pk == order.buyer and order.buy.end_date > timezone.now():        
+        #money.total = money.total + order.count * tmp_dish.price
         
+        order_list = buy.order_set.filter(buyer=order.buyer)
+        total_cost = 0
         for entry in order_list:
-            if entry.cost < return_cost:
-                return_cost = return_cost - entry.cost
-                money.total = money.total + entry.cost
-                entry.cost = 0
-                
-            else:
-                entry.cost = entry.cost - return_cost
-                money.total = money.total + return_cost
-                return_cost = 0
-            entry.save()            
+            tmp_dish = Dish.objects.get(pk=entry.dish_id)
+            total_cost = total_cost + tmp_dish.price * entry.count
         
+        if total_cost > buy.discount:
+            if (total_cost - order.count * tmp_dish.price) <= buy.discount:
+                money.total = money.total + total_cost - buy.discount
+            else:
+                money.total = money.total + order.count * dish.price
+                            
+        order.delete()
         money.save()           
     return HttpResponseRedirect(reverse('index'))

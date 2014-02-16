@@ -8,8 +8,13 @@
 {% csrf_token %}
 <input type="hidden" name="buy_pk" value="{{buy.pk}}">
 {% for dish in buy.get_menu.dish_set.all %}
-	<input type="radio" name="dish" value="{{ dish.pk }}" />{{ dish.dish_name }} : {{ dish.price }} <br/>
+	{% if forloop.first %}
+		<input type="radio" name="dish" value="{{ dish.pk }}" checked>{{ dish.dish_name }} : {{ dish.price }} <br/>
+	{% else %}
+		<input type="radio" name="dish" value="{{ dish.pk }}">{{ dish.dish_name }} : {{ dish.price }} <br/>
+	{% endif %}
 {% endfor %}
+<p>數量<input type="number" name="count" min="1" max="10" value="1"/></p>
 <input type="submit" value="Order" />
 </form>
 {% endblock %}

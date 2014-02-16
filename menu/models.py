@@ -36,11 +36,11 @@ class Buy(models.Model):
         for order in self.order_set.all():            
             if order.get_dish() in olist:
                 (count, name) = olist[order.get_dish()]                
-                olist[order.get_dish()] = (count+1, name + ", " + order.get_buyer().username, order.get_dish().price)
+                olist[order.get_dish()] = (count+order.count, name + ", " + order.get_buyer().username, order.get_dish().price)
             else:
-                olist[order.get_dish()] = (1, order.get_buyer().username, order.get_dish().price)
-            total = total + order.get_dish().price
-            total_count = total_count + 1
+                olist[order.get_dish()] = (order.count, order.get_buyer().username +"*"+ str(order.count), order.get_dish().price)
+            total = total + order.get_dish().price * order.count
+            total_count = total_count + order.count
         olist["Total"] = (total_count, "", total)
         
 
