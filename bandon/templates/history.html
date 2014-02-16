@@ -2,38 +2,45 @@
 
 {% block content %}
 {% if latest_buy_list %}
-<table frame="border" rules="all">
+<table class="table">
 <tr>
 <td>店家名稱</td>
 <td>訂購品項</td>
 <td>發起人</td>
 <td>截止時間</td>
 <td>狀態</td>
+<td>操作</td>
 </tr>  
     {% for buy in latest_buy_list %}    	    
         
         <tr>
         <td><a href="{% url 'menu:buy_list' buy.pk %}">{{buy.get_menu}}</a></td>        
-        <td>        
-        {% for order in buy.order_set.all %}
-	        {% if user.pk == order.buyer %}        
-	        	{{ order.get_dish }}[{{ order.count }}]	        	      
-	        {% endif %}
-        {% endfor %}
+        <td>
+		{% for order in buy.order_set.all %}			       
+			{% if user.pk == order.buyer %}
+				<a href="{% url 'menu:del_order' order.pk %}" class="btn btn-success" role="button">{{ order.get_dish }} <span class="badge">{{order.count}}</span></a>
+			{% endif %}
+		{% endfor %}       
         </td>        
         
         <td>{{buy.get_issuer}}</td>
 		<td>{{buy.end_date|date:"Y-m-d H:i l"}}
 		</td>
 		{% if buy.status == 0 %}
-			<td>開團
-			{% if user.is_staff %}
-			(<a href="{% url 'menu:del_buy' buy.pk %}">流標</a>)
-			{% endif %}
+			<td>
+			<span class="label label-success">開團</span>			
 			</td>
 		{% else %}
-			<td>流標</td>
+			<td><span class="label label-default">流標</span></td>
 		{% endif %}
+		
+		<td>
+		{% if buy.status == 0 %}
+			{% if user.is_staff %}
+				<a href="{% url 'menu:del_buy' buy.pk %}" class="btn btn-warning">取消訂購</a>
+			{% endif %}
+		{% endif %}
+		</td>
 		</tr>
        
     {% endfor %}

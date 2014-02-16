@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+  
+<form action="{% url 'menu:add_menu' %}" method="post">
+{% csrf_token %}
+<textarea name="menu_text" value="" class="form-control" rows="20" required autofocus> </textarea>
+<input type="submit" value="Add to Menu" />
+</form>
+
+{% endblock %}

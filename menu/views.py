@@ -14,7 +14,14 @@ class Buy_Form(forms.Form):
     start_time = forms.DateTimeField(initial=timezone.now())
     end_time = forms.DateTimeField(initial=timezone.now())
 
-
+class AddMenuView(generic.ListView):
+    template_name = 'menu/add_menu.html'
+    context_object_name = 'latest_menu_list'
+                
+    def get_queryset(self):
+        """Return the last five published polls."""
+        return Menu.objects.all()    
+    
 class IndexView(generic.ListView):
     template_name = 'menu/index.html'
     context_object_name = 'latest_menu_list'

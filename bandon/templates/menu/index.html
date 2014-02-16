@@ -2,10 +2,11 @@
 {% load staticfiles %}
 
 {% block content %}
+
 {% if latest_menu_list %}
-    <ul>
+    <ul class="list-group">
     {% for menu in latest_menu_list %}    
-        <li><a href="{% url 'menu:detail' menu.id %}">{{ menu.store_name }}
+        <li class="list-group-item"><a href="{% url 'menu:detail' menu.id %}">{{ menu.store_name }}
         {% if menu.misc %}
         	({{ menu.misc }})
         {% endif %}
@@ -16,10 +17,5 @@
     <p>No Menu are available.</p>
 {% endif %}
 
-<form action="{% url 'menu:add_menu' %}" method="post">
-{% csrf_token %}
-<textarea name="menu_text" value=""> </textarea>
-<br/>
-<input type="submit" value="Add to Menu" />
-</form>
+
 {% endblock %}
