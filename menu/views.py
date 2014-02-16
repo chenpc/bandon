@@ -89,6 +89,26 @@ def start_buy(request):
     buy.save()    
     return HttpResponseRedirect(reverse('index'))
 
+def del_buy(request, buy_pk):
+    buy = Buy.objects.get(pk=buy_pk)
+    return_list = dict()
+    for entry in buy.order_set.all():
+        tmp_dish = Dish.objects.get(pk=entry.dish_id)
+        if entry.buyer in return_list:
+            return_list[entry.buyer] = return_list[entry.buyer] + entry.count * tmp_dish.price            
+        else:
+            return_list[entry.buyer] = entry.count * tmp_dish.price        
+        
+    for k,v in return_list.items():
+        money = Money.objects.get(user=k)
+        if v - buy.discount >= 0:
+            money.total = money.total + (v - buy.discount)
+        money.save()
+        
+    buy.status = 1
+    buy.save()
+    return HttpResponseRedirect(reverse('history'))
+    
 def change_money(request):
     money = Money.objects.get(user=request.user.pk)
     print request.POST['change_money']
@@ -98,12 +118,15 @@ def change_money(request):
     
 def start_order(request):    
     buy = Buy.objects.get(pk=int(request.POST['buy_pk']))
+    
+    if buy.status !=0 and buy.end_date > timezone.now():
+        return HttpResponseRedirect(reverse('index'))        
+    
     count = int(request.POST['count'])
     order = buy.order_set.create()
     order.buyer = request.user.pk
     order.dish_id = int(request.POST['dish'])
     order.count = count
-    
     dish = Dish.objects.get(pk=order.dish_id)
     try:
         money = Money.objects.get(user=request.user.pk)

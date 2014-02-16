@@ -8,6 +8,7 @@
 <td>訂購品項</td>
 <td>發起人</td>
 <td>截止時間</td>
+<td>狀態</td>
 </tr>  
     {% for buy in latest_buy_list %}    	    
         
@@ -16,7 +17,7 @@
         <td>        
         {% for order in buy.order_set.all %}
 	        {% if user.pk == order.buyer %}        
-	        	{{ order.get_dish }}       
+	        	{{ order.get_dish }}[{{ order.count }}]	        	      
 	        {% endif %}
         {% endfor %}
         </td>        
@@ -24,6 +25,15 @@
         <td>{{buy.get_issuer}}</td>
 		<td>{{buy.end_date|date:"Y-m-d H:i l"}}
 		</td>
+		{% if buy.status == 0 %}
+			<td>開團
+			{% if user.is_staff %}
+			(<a href="{% url 'menu:del_buy' buy.pk %}">流標</a>)
+			{% endif %}
+			</td>
+		{% else %}
+			<td>流標</td>
+		{% endif %}
 		</tr>
        
     {% endfor %}
