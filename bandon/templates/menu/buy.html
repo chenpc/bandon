@@ -1,9 +1,7 @@
 {% extends "base.html" %}
-<h1>{{ buy.get_menu.store_name }} : TEL {{ buy.get_menu.tele_num }}</h1>
 {% load tz %}
 {% block content %}
-
-
+<p class="bg-success">{{ buy.get_menu.store_name }} : TEL {{ buy.get_menu.tele_num }}</p>
 <form action="{% url 'menu:start_order' %}" method="post">
 {% csrf_token %}
 <input type="hidden" name="buy_pk" value="{{buy.pk}}">
