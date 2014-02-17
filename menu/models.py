@@ -26,6 +26,7 @@ class Buy(models.Model):
     menu_id = models.IntegerField(default=0)
     discount = models.IntegerField(default=0)
     status = models.IntegerField(default=0)
+    type = models.IntegerField(default=0)
     def get_menu(self):
         return Menu.objects.get(pk=self.menu_id)
     def get_issuer(self):
@@ -43,9 +44,6 @@ class Buy(models.Model):
             total = total + order.get_dish().price * order.count
             total_count = total_count + order.count
         olist["Total"] = (total_count, "", total)
-        
-
-            
         return olist
     def __unicode__(self):
         return Menu.objects.get(pk=self.menu_id).store_name + " End Time " +self.end_date.__str__()

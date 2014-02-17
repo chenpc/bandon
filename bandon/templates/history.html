@@ -13,7 +13,13 @@
 <td>操作</td>
 </tr>  
     {% for buy in latest_buy_list %}
-        <tr>
+        <tr
+        {% if buy.type == 0 %}
+        	class="warning"
+        {% else %}
+        	class="info"
+        {% endif %}
+        >
         <td>
         {{ buy.pk }}
         </td>

@@ -181,6 +181,9 @@ def start_buy(request):
     
     if type == "dinner":  
         buy.discount = 80 # by QNAP
+        buy.type = 1
+    else:
+        buy.type = 0
            
     buy.menu_id = int(request.POST['menu_pk'])
     buy.issue_user = User.objects.get(username__exact=request.user.username).pk
