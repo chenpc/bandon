@@ -2,9 +2,9 @@
 
 {% block content %}
 {% if latest_buy_list %}
-<table class="table">
+<table class="table" >
 <tr>
-<td>訂單號碼</td>
+<td>#</td>
 <td>店家名稱</td>
 <td>訂購品項</td>
 <td>發起人</td>
@@ -32,10 +32,14 @@
 		</td>
 		{% if buy.status == 0 %}
 			<td>
-			<span class="label label-success">開團</span>			
+			{% if buy.end_date.date < today.date %}
+				<span class="label label-default">結束</span>
+			{% else %}
+				<span class="label label-success">開團</span>
+			{% endif %}			
 			</td>
 		{% else %}
-			<td><span class="label label-default">流標</span></td>
+			<td><span class="label label-danger">流標</span></td>
 		{% endif %}
 		
 		<td>

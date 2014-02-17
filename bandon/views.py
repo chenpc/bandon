@@ -47,11 +47,13 @@ class HistoryView(generic.ListView):
         # Add in a QuerySet of all the books
         try:
             context['money'] = self.request.user.money_set.get(user=self.request.user.pk)
+            context['today'] = datetime.datetime.now()
         except Money.DoesNotExist:
             money = self.request.user.money_set.create()
             money.total = 0
             money.save()
             context['money'] = money
+            context['today'] = datetime.datetime.now()
         return context
 
 
