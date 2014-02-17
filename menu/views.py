@@ -117,8 +117,7 @@ def del_buy(request, buy_pk):
     return HttpResponseRedirect(reverse('history'))
     
 def change_money(request):
-    money = Money.objects.get(user=request.user.pk)
-    print request.POST['change_money']
+    money = Money.objects.get(user=int(request.POST['userid']))
     money.total = money.total + int(request.POST['change_money'])
     money.save()
     return HttpResponseRedirect(reverse('recharge'))

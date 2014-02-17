@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block sidebar %}
-<td><a href="{% url 'register' %}">Register</a></td>
 {% endblock %}
 
 {% block content %}
@@ -18,6 +17,7 @@
 
 
 <button class="btn btn-lg btn-primary btn-block" type="submit">登入</button>
+<button class="btn btn-lg btn-default btn-block" type="submit"><a href="{% url 'register' %}">註冊新帳號</a></button>
 <input type="hidden" name="next" value="{{ next }}" />
 </form>
 
