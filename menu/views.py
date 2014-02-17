@@ -10,6 +10,32 @@ from menu.models import Menu, Dish, Buy, Order, Money
 import datetime
 from django.utils import timezone
 from django import forms
+import smtplib
+from email.mime.text import MIMEText
+
+def mail_buy(buy):
+    msg = MIMEText("開團訂購 http://10.77.150.1:8000/menu/%d/buy" % buy.pk, _charset='utf-8')
+    
+    menu = Menu.objects.get(pk=buy.menu_id)
+    user_list = User.objects.all()
+    you = ""
+    for user in User.objects.all():
+        if user.email and user.email != "admin@qnap.com":
+            you = you + user.email +  ", "
+    
+    print you
+
+    me = "admin@qnap.com"
+    msg['Subject'] = u"[開團] %s %s" % (menu.store_name, buy.end_date.strftime("%Y-%m-%d  %H:%M"))
+    msg['From'] = me
+    msg['To'] = you
+
+    # Send the message via our own SMTP server, but don't include the
+    # envelope header.
+    s = smtplib.SMTP('msa.hinet.net')
+    s.sendmail(me, [you], msg.as_string())
+    s.quit()
+
 class Buy_Form(forms.Form):
     start_time = forms.DateTimeField(initial=timezone.now())
     end_time = forms.DateTimeField(initial=timezone.now())
@@ -93,7 +119,8 @@ def start_buy(request):
            
     buy.menu_id = int(request.POST['menu_pk'])
     buy.issue_user = User.objects.get(username__exact=request.user.username).pk
-    buy.save()    
+    buy.save()
+    mail_buy(buy)
     return HttpResponseRedirect(reverse('index'))
 
 def del_buy(request, buy_pk):
