@@ -10,31 +10,44 @@ from menu.models import Menu, Dish, Buy, Order, Money
 import datetime
 from django.utils import timezone
 from django import forms
-import smtplib
-from email.mime.text import MIMEText
+from django.conf import settings
+from django.core.mail import send_mail
 
 def mail_buy(buy):
-    msg = MIMEText("開團訂購 http://10.77.150.1:8000/menu/%d/buy" % buy.pk, _charset='utf-8')
+    msg = "開團訂購 http://10.77.150.1:8000/menu/%d/buy" % buy.pk
     
-    menu = Menu.objects.get(pk=buy.menu_id)
-    user_list = User.objects.all()
+    menu = Menu.objects.get(pk=buy.menu_id)    
     you = ""
     for user in User.objects.all():
         if user.email and user.email != "admin@qnap.com":
             you = you + user.email +  ", "
-    
-    print you
 
     me = "admin@qnap.com"
-    msg['Subject'] = u"[開團] %s %s" % (menu.store_name, buy.end_date.strftime("%Y-%m-%d  %H:%M"))
-    msg['From'] = me
-    msg['To'] = you
+    Subject = u"[開團] %s %s" % (menu.store_name, buy.end_date.strftime("%Y-%m-%d  %H:%M"))
+    From = me
+    To = you
 
-    # Send the message via our own SMTP server, but don't include the
-    # envelope header.
-    s = smtplib.SMTP('msa.hinet.net')
-    s.sendmail(me, [you], msg.as_string())
-    s.quit()
+    send_mail(Subject, msg, settings.EMAIL_HOST_USER, [To], fail_silently=True)
+    
+def mail_cancel(buy):
+    msg = "訂購流標 http://10.77.150.1:8000/menu/%d/buy" % buy.pk
+    
+    menu = Menu.objects.get(pk=buy.menu_id)    
+    you = ""
+    for order in buy.order_set.all():
+        user = User.objects.get(pk=order.buyer)
+        if user.email:
+            you = you + user.email +  ", "
+
+    me = "admin@qnap.com"
+    Subject = u"[流標] %s %s" % (menu.store_name, buy.end_date.strftime("%Y-%m-%d  %H:%M"))
+    From = me
+    To = you
+
+    send_mail(Subject, msg, settings.EMAIL_HOST_USER, [To], fail_silently=True)
+      
+    
+    
 
 class Buy_Form(forms.Form):
     start_time = forms.DateTimeField(initial=timezone.now())
@@ -55,6 +68,18 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         """Return the last five published polls."""
         return Menu.objects.all()
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(IndexView, self).get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        try:
+            context['money'] = self.request.user.money_set.get(user=self.request.user.pk)
+        except Money.DoesNotExist:
+            money = self.request.user.money_set.create()
+            money.total = 0
+            money.save()
+            context['money'] = money
+        return context
         
 class OrderView(generic.ListView):
     template_name = 'menu/order.html'
@@ -67,14 +92,54 @@ class OrderView(generic.ListView):
 class DetailView(generic.DetailView):
     model = Menu
     template_name = 'menu/detail.html'
+    
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(DetailView, self).get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        try:
+            context['money'] = self.request.user.money_set.get(user=self.request.user.pk)
+        except Money.DoesNotExist:
+            money = self.request.user.money_set.create()
+            money.total = 0
+            money.save()
+            context['money'] = money
+        return context
+
  
 class BuyView(generic.DetailView):
     model = Buy
     template_name = 'menu/buy.html'
 
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(BuyView, self).get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        try:
+            context['money'] = self.request.user.money_set.get(user=self.request.user.pk)
+        except Money.DoesNotExist:
+            money = self.request.user.money_set.create()
+            money.total = 0
+            money.save()
+            context['money'] = money
+        return context
+
 class BuyListView(generic.DetailView):
     model = Buy
     template_name = 'menu/buy_list.html'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(BuyListView, self).get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        try:
+            context['money'] = self.request.user.money_set.get(user=self.request.user.pk)
+        except Money.DoesNotExist:
+            money = self.request.user.money_set.create()
+            money.total = 0
+            money.save()
+            context['money'] = money
+        return context
 
     
 def add_menu(request):    
@@ -141,6 +206,7 @@ def del_buy(request, buy_pk):
         
     buy.status = 1
     buy.save()
+    mail_cancel(buy)
     return HttpResponseRedirect(reverse('history'))
     
 def change_money(request):
