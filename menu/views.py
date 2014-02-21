@@ -75,8 +75,7 @@ class IndexView(generic.ListView):
         try:
             context['money'] = self.request.user.money_set.get(user=self.request.user.pk)
         except Money.DoesNotExist:
-            money = self.request.user.money_set.create()
-            money.total = 0
+            money = self.request.user.money_set.create()            
             money.save()
             context['money'] = money
         return context
@@ -100,8 +99,7 @@ class DetailView(generic.DetailView):
         try:
             context['money'] = self.request.user.money_set.get(user=self.request.user.pk)
         except Money.DoesNotExist:
-            money = self.request.user.money_set.create()
-            money.total = 0
+            money = self.request.user.money_set.create()            
             money.save()
             context['money'] = money
         return context
@@ -118,8 +116,7 @@ class BuyView(generic.DetailView):
         try:
             context['money'] = self.request.user.money_set.get(user=self.request.user.pk)
         except Money.DoesNotExist:
-            money = self.request.user.money_set.create()
-            money.total = 0
+            money = self.request.user.money_set.create()            
             money.save()
             context['money'] = money
         return context
@@ -135,8 +132,7 @@ class BuyListView(generic.DetailView):
         try:
             context['money'] = self.request.user.money_set.get(user=self.request.user.pk)
         except Money.DoesNotExist:
-            money = self.request.user.money_set.create()
-            money.total = 0
+            money = self.request.user.money_set.create()            
             money.save()
             context['money'] = money
         return context
@@ -192,20 +188,12 @@ def start_buy(request):
     return HttpResponseRedirect(reverse('index'))
 
 def del_buy(request, buy_pk):
-    buy = Buy.objects.get(pk=buy_pk)
-    return_list = dict()
+    buy = Buy.objects.get(pk=buy_pk)    
     for entry in buy.order_set.all():
         tmp_dish = Dish.objects.get(pk=entry.dish_id)
-        if entry.buyer in return_list:
-            return_list[entry.buyer] = return_list[entry.buyer] + entry.count * tmp_dish.price            
-        else:
-            return_list[entry.buyer] = entry.count * tmp_dish.price        
-        
-    for k,v in return_list.items():
-        money = Money.objects.get(user=k)
-        if v - buy.discount >= 0:
-            money.total = money.total + (v - buy.discount)
-        money.save()
+        money = Money.objects.get(user=entry.buyer)  
+        cost = tmp_dish.price * entry.count          
+        money.cost(entry, -cost, "流標退錢")
         
     buy.status = 1
     buy.save()
@@ -213,9 +201,9 @@ def del_buy(request, buy_pk):
     return HttpResponseRedirect(reverse('history'))
     
 def change_money(request):
-    money = Money.objects.get(user=int(request.POST['userid']))
-    money.total = money.total + int(request.POST['change_money'])
-    money.save()
+    if request.user.is_staff:
+        money = Money.objects.get(user=int(request.POST['userid']))
+        money.cost(None, -int(request.POST['change_money']), "儲值")
     return HttpResponseRedirect(reverse('recharge'))
     
 def start_order(request):    
@@ -233,8 +221,7 @@ def start_order(request):
     try:
         money = Money.objects.get(user=request.user.pk)
     except Money.DoesNotExist:
-        money = request.user.money_set.create()
-        money.total = 0
+        money = request.user.money_set.create()        
         money.save()
         
     order_list = buy.order_set.filter(buyer=order.buyer)
@@ -249,10 +236,9 @@ def start_order(request):
         cost = dish.price * order.count - (buy.discount - total_cost)
     
     if cost < 0:
-        cost = 0  
-    money.total = money.total - cost
+        cost = 0 
     
-    money.save()
+    money.cost(order, cost, "訂購")
     order.save()
     return HttpResponseRedirect(reverse('index'))
 
@@ -263,9 +249,7 @@ def del_order(request, order_pk):
     
     money = Money.objects.get(user=order.buyer)  
     
-    if request.user.pk == order.buyer and order.buy.end_date > timezone.now():        
-        #money.total = money.total + order.count * tmp_dish.price
-        
+    if request.user.pk == order.buyer and order.buy.end_date > timezone.now():
         order_list = buy.order_set.filter(buyer=order.buyer)
         total_cost = 0
         for entry in order_list:
@@ -274,10 +258,11 @@ def del_order(request, order_pk):
         
         if total_cost > buy.discount:
             if (total_cost - order.count * tmp_dish.price) <= buy.discount:
-                money.total = money.total + total_cost - buy.discount
+                cost = total_cost - buy.discount
             else:
-                money.total = money.total + order.count * dish.price
-                            
-        order.delete()
-        money.save()           
+                cost = order.count * dish.price
+                
+            money.cost(order, -cost, "取消訂購")                            
+        order.delete()              
+             
     return HttpResponseRedirect(reverse('index'))

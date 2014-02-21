@@ -17,8 +17,7 @@
 	
 	<!-- Optional theme -->
 	<link rel="stylesheet" href="{% static 'dist/css/bootstrap-theme.min.css' %}">	
-	<link rel="stylesheet" href="{% static 'signin.css' %}" />
-	
+	<link rel="stylesheet" href="{% static 'signin.css' %}" />	
 	
 	<!-- Latest compiled and minified JavaScript -->
 	<script src="{% static 'dist/js/bootstrap.min.js' %}"></script>
@@ -45,7 +44,8 @@
           <div class="navbar-collapse collapse">
           	<ul class="nav navbar-nav">
           		<li><a href="{% url 'menu:index' %}">菜單</a></li>
-          		<li><a href="{% url 'history' %}">歷史記錄</a></li>
+          		<li><a href="{% url 'history' %}">最近的訂單</a></li>
+          		<li><a href="{% url 'log' %}">交易記錄</a></li>
           	</ul>
           	<ul class="nav navbar-nav navbar-right">
           		{% if user.is_staff %}
