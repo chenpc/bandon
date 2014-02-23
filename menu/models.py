@@ -7,9 +7,19 @@ class Menu(models.Model):
     tele_num = models.CharField(max_length=200)
     type = models.IntegerField(default=0)
     misc = models.CharField(max_length=200)
+    tickets = models.IntegerField(default=0)
     def __unicode__(self):  # Python 3: def __str__(self):
         return self.store_name
+    def vote_list(self):
+        user_list = []        
+        for vote in self.vote_set.all():            
+            user_list.append(vote.user)
+        return user_list
 
+class Vote(models.Model):
+    menu = models.ForeignKey(Menu)
+    user = models.ForeignKey(User)
+    
 class Dish(models.Model):
     menu = models.ForeignKey(Menu)
     dish_name = models.CharField(max_length=200)
@@ -55,16 +65,39 @@ class Order(models.Model):
     dish_id = models.IntegerField(default=0)
     count = models.IntegerField(default=0)
     comment =  models.CharField(max_length=200)
-    cost = models.IntegerField(default=0)
+    cost = models.IntegerField(default=0)    
     def get_dish(self):
         return Dish.objects.get(pk=self.dish_id)
     def get_buyer(self):
         return User.objects.get(pk=self.buyer)
     def __unicode__(self):
-        return str(self.pk) + " " + User.objects.get(pk=self.buyer).username + " " + self.buy.__unicode__()+ " " + Dish.objects.get(pk=self.dish_id).dish_name
+        return User.objects.get(pk=self.buyer).username + " " + self.buy.__unicode__()+ " " + Dish.objects.get(pk=self.dish_id).dish_name
+
+
 
 class Money(models.Model):
     user = models.ForeignKey(User)
     total = models.IntegerField(default=0)
+    def cost(self, order, cost, reason):
+        log = self.log_set.create()
+        log.money = self
+        log.order = order
+        log.cost = -cost
+        self.total = self.total - cost
+        log.left = self.total
+        log.reason = reason
+        self.save()        
+        log.save()
+        
     def __unicode__(self):
-        return str(self.user.pk) + " " + self.user.username
+        return self.user.username
+    
+class Log(models.Model):
+    money = models.ForeignKey(Money)
+    order = models.ForeignKey(Order, null=True)
+    cost = models.IntegerField(default=0)
+    left = models.IntegerField(default=0)
+    log_time = models.DateTimeField(auto_now_add=True)
+    reason = models.CharField(max_length=20)
+    def __unicode__(self):
+        return str(self.pk) + " " + unicode(self.order) + str(self.cost)

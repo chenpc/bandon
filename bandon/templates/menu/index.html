@@ -10,7 +10,16 @@
         {% if menu.misc %}
         	({{ menu.misc }})
         {% endif %}
-        </a></li>
+        </a>
+        - {{ menu.tickets }}票
+        {% if user not in menu.vote_list %}
+        	<a href="{% url 'menu:vote' menu.id %}">[推薦]</a>
+        {% else %}
+        	[你已推薦]
+        {% endif %}
+        
+        
+        </li>
     {% endfor %}
     </ul>
 {% else %}
