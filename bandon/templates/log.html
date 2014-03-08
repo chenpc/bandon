@@ -7,6 +7,7 @@
 <td>#</td>
 <td>店家名稱</td>
 <td>訂購品項</td>
+<td>數量</td>
 <td>交易金額</td>
 <td>結餘</td>
 <td>記錄時間</td>
@@ -20,11 +21,12 @@
         </td>
         {% if log.order.buy.get_menu %}
         <td> {{log.order.buy.get_menu}}</td>
-        <td> {{log.order.get_dish}}</td>
-        {% else %}
+        <td> {{log.order.get_dish}}</td>        
+        {% else %}        
         <td> 系統 </td>
-        <td> 儲值 </td>
-        {% endif %}        
+        <td> 儲值 </td>        
+        {% endif %}
+        <td> {{log.order.count}}</td>        
         <td> {{log.cost}}</td>
         <td>{{log.left}}</td>
         <td>{{log.log_time|date:"Y-m-d H:i"}}</td> 

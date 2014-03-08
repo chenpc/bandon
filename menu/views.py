@@ -86,7 +86,7 @@ class OrderView(generic.ListView):
                 
     def get_queryset(self):
         """Return the last five published polls."""
-        return Order.objects.all()
+        return Order.objects.get(vaild=1)
       
 class DetailView(generic.DetailView):
     model = Menu
@@ -120,6 +120,23 @@ class BuyView(generic.DetailView):
             money.save()
             context['money'] = money
         return context
+
+class AdminBuyView(generic.DetailView):
+    model = Buy
+    template_name = 'menu/admin_buy.html'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(AdminBuyView, self).get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        try:
+            context['money'] = self.request.user.money_set.get(user=self.request.user.pk)
+        except Money.DoesNotExist:
+            money = self.request.user.money_set.create()            
+            money.save()
+            context['money'] = money
+        return context
+
 
 class BuyListView(generic.DetailView):
     model = Buy
@@ -255,27 +272,69 @@ def start_order(request):
     order.save()
     return HttpResponseRedirect(reverse('index'))
 
+def admin_order(request):    
+    buy = Buy.objects.get(pk=int(request.POST['buy_pk']))
+    
+    if buy.status !=0 and buy.end_date > timezone.now():
+        return HttpResponseRedirect(reverse('index'))        
+    
+    count = int(request.POST['count'])
+    user = User.objects.get(username=request.POST['user']  )  
+    order = buy.order_set.create()    
+    order.buyer = user.pk
+    order.dish_id = int(request.POST['dish'])
+    order.count = count
+    dish = Dish.objects.get(pk=order.dish_id)
+    try:
+        money = Money.objects.get(user=order.buyer)
+    except Money.DoesNotExist:
+        money = user.money_set.create()        
+        money.save()
+        
+    order_list = buy.order_set.filter(buyer=order.buyer)
+    total_cost = 0    
+    for entry in order_list:
+        tmp_dish = Dish.objects.get(pk=entry.dish_id) 
+        total_cost = total_cost + tmp_dish.price * entry.count
+    
+    if total_cost - buy.discount >= 0:
+        cost = dish.price * order.count
+    else:
+        cost = dish.price * order.count - (buy.discount - total_cost)
+    
+    if cost < 0:
+        cost = 0 
+    
+    money.cost(order, cost, "管理者代訂")
+    order.save()
+    return HttpResponseRedirect(reverse('index'))
+
 def del_order(request, order_pk):    
     order = Order.objects.get(pk=order_pk)
-    buy = order.buy
-    dish = Dish.objects.get(pk=order.dish_id)
-    
-    money = Money.objects.get(user=order.buyer)  
-    
-    if request.user.pk == order.buyer and order.buy.end_date > timezone.now():
-        order_list = buy.order_set.filter(buyer=order.buyer)
-        total_cost = 0
-        for entry in order_list:
-            tmp_dish = Dish.objects.get(pk=entry.dish_id)
-            total_cost = total_cost + tmp_dish.price * entry.count
+    if order.vaild:
+        buy = order.buy
+        dish = Dish.objects.get(pk=order.dish_id)
         
-        if total_cost > buy.discount:
-            if (total_cost - order.count * tmp_dish.price) <= buy.discount:
-                cost = total_cost - buy.discount
-            else:
-                cost = order.count * dish.price
-                
-            money.cost(order, -cost, "取消訂購")                            
-        order.delete()              
+        money = Money.objects.get(user=order.buyer)  
+        
+        if (request.user.pk == order.buyer and order.buy.end_date > timezone.now()) or request.user.is_staff:
+            order_list = buy.order_set.filter(buyer=order.buyer)
+            total_cost = 0
+            for entry in order_list:
+                tmp_dish = Dish.objects.get(pk=entry.dish_id)
+                total_cost = total_cost + tmp_dish.price * entry.count
+            
+            if total_cost > buy.discount:
+                if (total_cost - order.count * tmp_dish.price) <= buy.discount:
+                    cost = total_cost - buy.discount
+                else:
+                    cost = order.count * dish.price
+                    
+                if request.user.is_staff:
+                    money.cost(order, -cost, "管理者取消訂購")
+                else:
+                    money.cost(order, -cost, "取消訂購")                            
+            order.vaild = 0
+            order.save()              
              
     return HttpResponseRedirect(reverse('index'))

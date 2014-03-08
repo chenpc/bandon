@@ -37,6 +37,8 @@ class Buy(models.Model):
     discount = models.IntegerField(default=0)
     status = models.IntegerField(default=0)
     type = models.IntegerField(default=0)
+    def get_order(self):
+        return self.order_set.filter(vaild=1)
     def get_menu(self):
         return Menu.objects.get(pk=self.menu_id)
     def get_issuer(self):
@@ -45,12 +47,13 @@ class Buy(models.Model):
         olist = dict()
         total = 0
         total_count = 0        
-        for order in self.order_set.all():            
+        for order in self.order_set.filter(vaild=1):            
             if order.get_dish() in olist:
-                (count, name) = olist[order.get_dish()]                
-                olist[order.get_dish()] = (count+order.count, name + ", " + order.get_buyer().username, order.get_dish().price)
+                (p1, p2) = olist[order.get_dish()]                                
+                p1.append(order)                
+                olist[order.get_dish()] = (p1, p2 + order.count)                                
             else:
-                olist[order.get_dish()] = (order.count, order.get_buyer().username +"*"+ str(order.count), order.get_dish().price)
+                olist[order.get_dish()] = ([order, ], order.count)
             total = total + order.get_dish().price * order.count
             total_count = total_count + order.count
         olist["Total"] = (total_count, "", total)
@@ -65,7 +68,10 @@ class Order(models.Model):
     dish_id = models.IntegerField(default=0)
     count = models.IntegerField(default=0)
     comment =  models.CharField(max_length=200)
-    cost = models.IntegerField(default=0)    
+    cost = models.IntegerField(default=0)
+    vaild = models.IntegerField(default=1)    
+    def get_cost(self):
+        return self.get_dish().price * self.count
     def get_dish(self):
         return Dish.objects.get(pk=self.dish_id)
     def get_buyer(self):

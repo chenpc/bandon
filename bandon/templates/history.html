@@ -26,7 +26,7 @@
         
         <td><a href="{% url 'menu:buy_list' buy.pk %}">{{buy.get_menu}}</a></td>        
         <td>
-		{% for order in buy.order_set.all %}			       
+		{% for order in buy.get_order %}			       
 			{% if user.pk == order.buyer %}
 				<span class="label label-success">{{ order.get_dish }} <span class="badge">{{order.count}}</span></span>
 			{% endif %}
