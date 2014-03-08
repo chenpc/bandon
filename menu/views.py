@@ -135,6 +135,8 @@ class AdminBuyView(generic.DetailView):
             money = self.request.user.money_set.create()            
             money.save()
             context['money'] = money
+            
+        context['userlist'] = User.objects.filter(is_staff=False)
         return context
 
 
@@ -205,7 +207,7 @@ def start_buy(request):
     else:
         buy.type = 0
            
-    buy.menu_id = int(request.POST['menu_pk'])
+    buy.menu_id = int(request.POST['menu_pk'])    
     buy.issue_user = User.objects.get(username__exact=request.user.username).pk
     menu = Menu.objects.get(pk=buy.menu_id)
     for vote in menu.vote_set.all():
@@ -247,6 +249,7 @@ def start_order(request):
     order.buyer = request.user.pk
     order.dish_id = int(request.POST['dish'])
     order.count = count
+    order.comment = request.POST['misc']
     dish = Dish.objects.get(pk=order.dish_id)
     try:
         money = Money.objects.get(user=request.user.pk)
@@ -284,6 +287,7 @@ def admin_order(request):
     order.buyer = user.pk
     order.dish_id = int(request.POST['dish'])
     order.count = count
+    order.comment = request.POST['misc']
     dish = Dish.objects.get(pk=order.dish_id)
     try:
         money = Money.objects.get(user=order.buyer)
@@ -311,7 +315,7 @@ def admin_order(request):
 
 def del_order(request, order_pk):    
     order = Order.objects.get(pk=order_pk)
-    if order.vaild:
+    if order.valid:
         buy = order.buy
         dish = Dish.objects.get(pk=order.dish_id)
         
@@ -334,7 +338,7 @@ def del_order(request, order_pk):
                     money.cost(order, -cost, "管理者取消訂購")
                 else:
                     money.cost(order, -cost, "取消訂購")                            
-            order.vaild = 0
+            order.valid = 0
             order.save()              
              
     return HttpResponseRedirect(reverse('index'))

@@ -18,7 +18,14 @@
 	</div>
 {% endfor %}
 <p>數量<input type="number" name="count" min="1" max="20" value="1"/></p>
-<p>幫誰訂<input type="text" name="user"/></p>
+<p>幫誰訂
+<select class="form-control" name="user">
+{% for user in userlist %}
+	<option>{{user.username}}</option>
+{%endfor%}
+</select>
+</p>
+<p>附註<input type="text" name="misc"/></p>
 <input type="submit" value="Order" />
 </form>
 {% endblock %}

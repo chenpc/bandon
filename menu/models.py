@@ -36,9 +36,9 @@ class Buy(models.Model):
     menu_id = models.IntegerField(default=0)
     discount = models.IntegerField(default=0)
     status = models.IntegerField(default=0)
-    type = models.IntegerField(default=0)
+    type = models.IntegerField(default=0)    
     def get_order(self):
-        return self.order_set.filter(vaild=1)
+        return self.order_set.filter(valid=1)
     def get_menu(self):
         return Menu.objects.get(pk=self.menu_id)
     def get_issuer(self):
@@ -47,7 +47,7 @@ class Buy(models.Model):
         olist = dict()
         total = 0
         total_count = 0        
-        for order in self.order_set.filter(vaild=1):            
+        for order in self.order_set.filter(valid=1):            
             if order.get_dish() in olist:
                 (p1, p2) = olist[order.get_dish()]                                
                 p1.append(order)                
@@ -69,7 +69,7 @@ class Order(models.Model):
     count = models.IntegerField(default=0)
     comment =  models.CharField(max_length=200)
     cost = models.IntegerField(default=0)
-    vaild = models.IntegerField(default=1)    
+    valid = models.IntegerField(default=1)    
     def get_cost(self):
         return self.get_dish().price * self.count
     def get_dish(self):
