@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load tz %}
+{% block content %}
+<p class="bg-success">{{ buy.get_menu.store_name }} : TEL {{ buy.get_menu.tele_num }}</p>
+<form action="{% url 'menu:admin_order' %}" method="post">
+{% csrf_token %}
+<input type="hidden" name="buy_pk" value="{{buy.pk}}">
+
+{% for dish in buy.get_menu.dish_set.all %}
+	<div class="radio">
+	<label>
+		{% if forloop.first %}
+			<input type="radio" name="dish" value="{{ dish.pk }}" checked>{{ dish.dish_name }} : {{ dish.price }} <br/>
+		{% else %}
+			<input type="radio" name="dish" value="{{ dish.pk }}">{{ dish.dish_name }} : {{ dish.price }} <br/>
+		{% endif %}
+	</label>
+	</div>
+{% endfor %}
+<p>數量<input type="number" name="count" min="1" max="20" value="1"/></p>
+<p>幫誰訂<input type="text" name="user"/></p>
+<input type="submit" value="Order" />
+</form>
+{% endblock %}

@@ -195,7 +195,7 @@ def start_buy(request):
     if type == "launch":
         df = datetime.timedelta(hours=10)
     else:
-        df = datetime.timedelta(hours=15)       
+        df = datetime.timedelta(hours=16)       
     buy = Buy.objects.create(start_date=timezone.now(),
         end_date=timezone.make_aware(datetime.datetime.strptime(request.POST['end_time'], "%m/%d/%Y")+df, timezone.get_current_timezone()))
     
