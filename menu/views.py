@@ -14,7 +14,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 
 def mail_buy(buy):
-    msg = "開團訂購 http://10.77.150.1:8000/menu/%d/buy" % buy.pk
+    msg = "開團訂購 http://192.168.72.206:8000/menu/%d/buy" % buy.pk
     
     menu = Menu.objects.get(pk=buy.menu_id)    
     you = ""
@@ -30,7 +30,7 @@ def mail_buy(buy):
     send_mail(Subject, msg, settings.EMAIL_HOST_USER, [To], fail_silently=True)
     
 def mail_cancel(buy):
-    msg = "訂購流標 http://10.77.150.1:8000/menu/%d/buy" % buy.pk
+    msg = "訂購流標 http://192.168.72.206:8000/menu/%d/buy" % buy.pk
     
     menu = Menu.objects.get(pk=buy.menu_id)    
     you = ""
@@ -200,16 +200,17 @@ def start_buy(request):
     return HttpResponseRedirect(reverse('index'))
 
 def del_buy(request, buy_pk):
-    buy = Buy.objects.get(pk=buy_pk)    
-    for entry in buy.order_set.all():
-        tmp_dish = Dish.objects.get(pk=entry.dish_id)
-        money = Money.objects.get(user=entry.buyer)  
-        cost = tmp_dish.price * entry.count          
-        money.cost(entry, -cost, "流標退錢")
-        
-    buy.status = 1
-    buy.save()
-    mail_cancel(buy)
+    if request.user.is_staff:
+        buy = Buy.objects.get(pk=buy_pk)    
+        for entry in buy.order_set.all():
+            tmp_dish = Dish.objects.get(pk=entry.dish_id)
+            money = Money.objects.get(user=entry.buyer)  
+            cost = tmp_dish.price * entry.count          
+            money.cost(entry, -cost, "流標退錢")
+            
+        buy.status = 1
+        buy.save()
+        mail_cancel(buy)
     return HttpResponseRedirect(reverse('history'))
     
 def change_money(request):
