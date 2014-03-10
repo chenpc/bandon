@@ -4,24 +4,36 @@
 {% block content %}
 
 {% if latest_menu_list %}
-    <ul class="list-group">
-    {% for menu in latest_menu_list %}    
-        <li class="list-group-item"><a href="{% url 'menu:detail' menu.id %}">{{ menu.store_name }}
+	<table class="table">
+	<td>店家名稱</td>
+	<td>說明</td>
+	<td>關注度</td>
+	<td>推薦</td>	
+    {% for menu in latest_menu_list %}
+    <tr>    
+        <td><a href="{% url 'menu:detail' menu.id %}">{{ menu.store_name }} </a></td>
+        <td>
         {% if menu.misc %}
         	({{ menu.misc }})
         {% endif %}
-        </a>
-        - {{ menu.tickets }}票
+        </td>
+        <td>
+        {{ menu.tickets }}票
+        </td>
+        <td>
         {% if user not in menu.vote_list %}
         	<a href="{% url 'menu:vote' menu.id %}">[推薦]</a>
         {% else %}
         	[你已推薦]
         {% endif %}
+        </td>
         
         
-        </li>
+        
+        </tr>
     {% endfor %}
-    </ul>
+    </table>
+    
 {% else %}
     <p>No Menu are available.</p>
 {% endif %}

@@ -98,8 +98,7 @@ def adduser(request):
     pwd1 = request.POST['pwd1']
     pwd2 = request.POST['pwd2']
         
-    if pwd1 == pwd2:
-        
+    if pwd1 == pwd2:        
         try:
             user = User.objects.get(username=user_name)
         except User.DoesNotExist:

@@ -34,7 +34,7 @@ def mail_cancel(buy):
     
     menu = Menu.objects.get(pk=buy.menu_id)    
     you = ""
-    for order in buy.order_set.all():
+    for order in buy.order_set.filter(valid=1):
         user = User.objects.get(pk=order.buyer)
         if user.email:
             you = you + user.email +  ", "
@@ -207,7 +207,8 @@ def start_buy(request):
     else:
         buy.type = 0
            
-    buy.menu_id = int(request.POST['menu_pk'])    
+    buy.menu_id = int(request.POST['menu_pk'])   
+    buy.comment =  request.POST['misc']
     buy.issue_user = User.objects.get(username__exact=request.user.username).pk
     menu = Menu.objects.get(pk=buy.menu_id)
     for vote in menu.vote_set.all():
@@ -220,12 +221,31 @@ def start_buy(request):
 
 def del_buy(request, buy_pk):
     if request.user.is_staff:
-        buy = Buy.objects.get(pk=buy_pk)    
-        for entry in buy.order_set.all():
-            tmp_dish = Dish.objects.get(pk=entry.dish_id)
-            money = Money.objects.get(user=entry.buyer)  
-            cost = tmp_dish.price * entry.count          
-            money.cost(entry, -cost, "流標退錢")
+        buy = Buy.objects.get(pk=buy_pk)  
+          
+        for order in buy.order_set.filter(valid=1):
+            buy = order.buy
+            dish = Dish.objects.get(pk=order.dish_id)
+            
+            money = Money.objects.get(user=order.buyer)                  
+            
+            order_list = buy.order_set.filter(buyer=order.buyer, valid=1)
+            total_cost = 0
+            for entry in order_list:
+                tmp_dish = Dish.objects.get(pk=entry.dish_id)
+                total_cost = total_cost + tmp_dish.price * entry.count                
+            
+            cost = 0
+            if total_cost > buy.discount:
+                if (total_cost - order.count * dish.price) <= buy.discount:
+                    cost = total_cost - buy.discount                    
+                else:
+                    cost = order.count * dish.price
+                    
+            money.cost(order, -cost, "管理者取消訂購")                            
+            order.valid = 0
+            order.save()              
+             
             
         buy.status = 1
         buy.save()
@@ -245,10 +265,13 @@ def start_order(request):
         return HttpResponseRedirect(reverse('index'))        
     
     count = int(request.POST['count'])
+    if count < 1:
+        return HttpResponseRedirect(reverse('index'))
     order = buy.order_set.create()
     order.buyer = request.user.pk
     order.dish_id = int(request.POST['dish'])
     order.count = count
+    
     order.comment = request.POST['misc']
     dish = Dish.objects.get(pk=order.dish_id)
     try:
@@ -257,7 +280,7 @@ def start_order(request):
         money = request.user.money_set.create()        
         money.save()
         
-    order_list = buy.order_set.filter(buyer=order.buyer)
+    order_list = buy.order_set.filter(buyer=order.buyer, valid=1)
     total_cost = 0    
     for entry in order_list:
         tmp_dish = Dish.objects.get(pk=entry.dish_id) 
@@ -295,7 +318,7 @@ def admin_order(request):
         money = user.money_set.create()        
         money.save()
         
-    order_list = buy.order_set.filter(buyer=order.buyer)
+    order_list = buy.order_set.filter(buyer=order.buyer, valid=1)
     total_cost = 0    
     for entry in order_list:
         tmp_dish = Dish.objects.get(pk=entry.dish_id) 
@@ -322,17 +345,17 @@ def del_order(request, order_pk):
         money = Money.objects.get(user=order.buyer)  
         
         if (request.user.pk == order.buyer and order.buy.end_date > timezone.now()) or request.user.is_staff:
-            order_list = buy.order_set.filter(buyer=order.buyer)
+            order_list = buy.order_set.filter(buyer=order.buyer, valid=1)
             total_cost = 0
             for entry in order_list:
                 tmp_dish = Dish.objects.get(pk=entry.dish_id)
                 total_cost = total_cost + tmp_dish.price * entry.count
             
             if total_cost > buy.discount:
-                if (total_cost - order.count * tmp_dish.price) <= buy.discount:
-                    cost = total_cost - buy.discount
+                if (total_cost - order.count * dish.price) <= buy.discount:
+                    cost = total_cost - buy.discount                    
                 else:
-                    cost = order.count * dish.price
+                    cost = order.count * dish.price                    
                     
                 if request.user.is_staff:
                     money.cost(order, -cost, "管理者取消訂購")

@@ -36,7 +36,8 @@ class Buy(models.Model):
     menu_id = models.IntegerField(default=0)
     discount = models.IntegerField(default=0)
     status = models.IntegerField(default=0)
-    type = models.IntegerField(default=0)    
+    type = models.IntegerField(default=0)  
+    comment = models.CharField(max_length=200)
     def get_order(self):
         return self.order_set.filter(valid=1)
     def get_menu(self):
