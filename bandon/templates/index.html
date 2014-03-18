@@ -6,6 +6,7 @@
 <tr>
 <td>#</td>
 <td>店家名稱</td>
+<td>類型</td>
 <td>說明</td>
 <td>開始訂購</td>
 <td>訂購品項 (點擊取消)</td>
@@ -25,6 +26,11 @@
 				{{ buy.pk }}
 			   </td>
 		       <td><a href="{% url 'menu:buy_list' buy.pk %}">{{buy.get_menu}}</a></td>
+		        {% if buy.type == 0 %}
+			       <td>午餐</td>
+		        {% else %}
+			       <td>晚餐</td>
+		        {% endif %}	               
 		       <td>{{buy.comment}}</td>
 		       <td><a href="{% url 'menu:buy' buy.pk %}" class="btn btn-primary" role="button">我要訂</a></td>
 		       <td>

@@ -60,5 +60,8 @@
 </table>
 {% if user.is_staff %}
 <button class="btn btn-lg btn-default"><a href="{% url 'menu:admin_buy' buy.pk %}">代訂</a></button>
+	{% if buy.status == 0 %}
+		<a href="{% url 'menu:del_buy' buy.pk %}" class="btn btn-warning">取消訂購</a>
+	{% endif %}
 {% endif %}
 {% endblock %}

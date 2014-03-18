@@ -34,7 +34,7 @@ def mail_cancel(buy):
     
     menu = Menu.objects.get(pk=buy.menu_id)    
     you = ""
-    for order in buy.order_set.filter(valid=1):
+    for order in buy.order_set.all():
         user = User.objects.get(pk=order.buyer)
         if user.email:
             you = you + user.email +  ", "
@@ -45,9 +45,6 @@ def mail_cancel(buy):
     To = you
 
     send_mail(Subject, msg, settings.EMAIL_HOST_USER, [To], fail_silently=True)
-      
-    
-    
 
 class Buy_Form(forms.Form):
     start_time = forms.DateTimeField(initial=timezone.now())
@@ -360,7 +357,9 @@ def del_order(request, order_pk):
                 if request.user.is_staff:
                     money.cost(order, -cost, "管理者取消訂購")
                 else:
-                    money.cost(order, -cost, "取消訂購")                            
+                    money.cost(order, -cost, "取消訂購")
+            else:
+                    money.cost(order, 0, "取消訂購")
             order.valid = 0
             order.save()              
              

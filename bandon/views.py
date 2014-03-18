@@ -1,4 +1,4 @@
-from menu.models import Buy, Money
+from menu.models import Buy, Money, Log
 from django.views import generic
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
@@ -39,7 +39,10 @@ class LogView(generic.ListView):
     context_object_name = 'latest_log_list'              
     def get_queryset(self):
         money = Money.objects.get(user=self.request.user.pk)
-        return money.log_set.order_by('-log_time')[:100]
+	if self.request.user.is_staff:
+		return Log.objects.order_by('-log_time')[:100]
+	else:
+	        return money.log_set.order_by('-log_time')[:100]
     
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context

@@ -10,7 +10,6 @@
 <td>發起人</td>
 <td>截止時間</td>
 <td>狀態</td>
-<td>操作</td>
 </tr>  
     {% for buy in latest_buy_list %}
         <tr
@@ -48,13 +47,6 @@
 			<td><span class="label label-danger">流標</span></td>
 		{% endif %}
 		
-		<td>
-		{% if buy.status == 0 %}
-			{% if user.is_staff %}
-				<a href="{% url 'menu:del_buy' buy.pk %}" class="btn btn-warning">取消訂購</a>
-			{% endif %}
-		{% endif %}
-		</td>
 		</tr>
        
     {% endfor %}
