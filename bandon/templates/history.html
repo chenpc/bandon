@@ -6,6 +6,7 @@
 <tr>
 <td>#</td>
 <td>店家名稱</td>
+<td>類型</td>
 <td>訂購品項</td>
 <td>發起人</td>
 <td>截止時間</td>
@@ -23,7 +24,13 @@
         {{ buy.pk }}
         </td>
         
-        <td><a href="{% url 'menu:buy_list' buy.pk %}">{{buy.get_menu}}</a></td>        
+        <td><a href="{% url 'menu:buy_list' buy.pk %}">{{buy.get_menu}}</a></td>
+	{% if buy.type == 0 %}
+	       <td>{{ buy.end_date|date:"m/d"}} 午餐</td>
+	{% else %}
+	       <td>{{ buy.end_date|date:"m/d"}} 晚餐</td>
+	{% endif %}	               
+	
         <td>
 		{% for order in buy.get_order %}			       
 			{% if user.pk == order.buyer %}
@@ -37,7 +44,7 @@
 		</td>
 		{% if buy.status == 0 %}
 			<td>
-			{% if buy.end_date.date < today.date %}
+			{% if buy.end_date.date < today.date%}
 				<span class="label label-default">結束</span>
 			{% else %}
 				<span class="label label-success">開團</span>

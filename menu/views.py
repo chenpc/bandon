@@ -17,34 +17,28 @@ def mail_buy(buy):
     msg = "開團訂購 http://192.168.72.220/menu/%d/buy" % buy.pk
     
     menu = Menu.objects.get(pk=buy.menu_id)    
-    you = ""
+    you = []
     for user in User.objects.all():
         if user.email and user.email != "admin@qnap.com":
-            you = you + user.email +  ", "
+            you.append(str(user.email))
 
-    me = "admin@qnap.com"
     Subject = u"[開團] %s %s" % (menu.store_name, buy.end_date.strftime("%Y-%m-%d  %H:%M"))
-    From = me
-    To = you
 
-    send_mail(Subject, msg, settings.EMAIL_HOST_USER, [To], fail_silently=True)
+    send_mail(Subject, msg, settings.EMAIL_HOST_USER, you, fail_silently=True)
     
 def mail_cancel(buy):
     msg = "訂購流標 http://192.168.72.220/menu/%d/buy" % buy.pk
     
     menu = Menu.objects.get(pk=buy.menu_id)    
-    you = ""
+    you = []
     for order in buy.order_set.all():
         user = User.objects.get(pk=order.buyer)
         if user.email:
-            you = you + user.email +  ", "
+            you.append(str(user.email))
 
-    me = "admin@qnap.com"
     Subject = u"[流標] %s %s" % (menu.store_name, buy.end_date.strftime("%Y-%m-%d  %H:%M"))
-    From = me
-    To = you
 
-    send_mail(Subject, msg, settings.EMAIL_HOST_USER, [To], fail_silently=True)
+    send_mail(Subject, msg, settings.EMAIL_HOST_USER, you, fail_silently=True)
 
 class Buy_Form(forms.Form):
     start_time = forms.DateTimeField(initial=timezone.now())
@@ -183,7 +177,12 @@ def add_menu(request):
 
 def start_vote(request, menu_pk):
     menu = Menu.objects.get(pk=menu_pk)
+    voted = menu.vote_set.filter(user=request.user)
+    if voted:
+	return HttpResponseRedirect(reverse('menu:index'))
+
     vote = menu.vote_set.create(user=request.user)
+    
     menu.tickets = menu.tickets + 1
     vote.save()
     menu.save()
@@ -258,7 +257,7 @@ def change_money(request):
 def start_order(request):    
     buy = Buy.objects.get(pk=int(request.POST['buy_pk']))
     
-    if buy.status !=0 and buy.end_date > timezone.now():
+    if buy.status != 0 and buy.end_date > timezone.now():
         return HttpResponseRedirect(reverse('index'))        
     
     count = int(request.POST['count'])

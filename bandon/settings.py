@@ -1,20 +1,20 @@
 # Django settings for bandon project.
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
-
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
-PROJ_DIR="/Users/chenpc/git/"
+PROJ_DIR="/home/chenpc/"
 
 MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': PROJ_DIR+'/bandon/sqlite.db',                      # Or path to database file if using sqlite3.
+        'NAME': PROJ_DIR+'bandon/sqlite.db',                      # Or path to database file if using sqlite3.
+	'ATOMIC_REQUEST':True,
         # The following settings are not used with sqlite3:
         'USER': '',
         'PASSWORD': '',
@@ -25,7 +25,7 @@ DATABASES = {
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["192.168.72.220",]
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -128,7 +128,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     'django.contrib.admindocs',
-    'polls',
     'menu',
 )
 
@@ -160,3 +159,9 @@ LOGGING = {
         },
     }
 }
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'qnapbandon@gmail.com'
+EMAIL_HOST_PASSWORD = ''
