@@ -46,6 +46,8 @@
 			<td>
 			{% if buy.end_date.date < today.date%}
 				<span class="label label-default">結束</span>
+			{% elif buy.end_date.date == today.date and buy.end_date.time < today.time%}
+				<span class="label label-default">結束</span>
 			{% else %}
 				<span class="label label-success">開團</span>
 			{% endif %}			

@@ -36,7 +36,7 @@ def mail_cancel(buy):
         if user.email:
             you.append(str(user.email))
 
-    Subject = u"[流標] %s %s" % (menu.store_name, buy.end_date.strftime("%Y-%m-%d  %H:%M"))
+    Subject = u"[流團] %s %s" % (menu.store_name, buy.end_date.strftime("%Y-%m-%d  %H:%M"))
 
     send_mail(Subject, msg, settings.EMAIL_HOST_USER, you, fail_silently=True)
 
@@ -257,7 +257,7 @@ def change_money(request):
 def start_order(request):    
     buy = Buy.objects.get(pk=int(request.POST['buy_pk']))
     
-    if buy.status != 0 and buy.end_date > timezone.now():
+    if buy.status != 0 or buy.end_date < timezone.now():
         return HttpResponseRedirect(reverse('index'))        
     
     count = int(request.POST['count'])
@@ -297,7 +297,7 @@ def start_order(request):
 def admin_order(request):    
     buy = Buy.objects.get(pk=int(request.POST['buy_pk']))
     
-    if buy.status !=0 and buy.end_date > timezone.now():
+    if buy.status !=0:
         return HttpResponseRedirect(reverse('index'))        
     
     count = int(request.POST['count'])

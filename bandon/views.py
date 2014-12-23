@@ -50,13 +50,13 @@ class LogView(generic.ListView):
         # Add in a QuerySet of all the books
         try:
             context['money'] = Money.objects.get(user=self.request.user.pk)
-            context['today'] = datetime.datetime.now()
+            context['today'] = timezone.now() #datetime.datetime.now()
         except Money.DoesNotExist:
             money = self.request.user.money_set.create()
             money.total = 0
             money.save()
             context['money'] = money
-            context['today'] = datetime.datetime.now()
+            context['today'] = timezone.now() #datetime.datetime.now()
         return context
         
 class HistoryView(generic.ListView):
@@ -72,13 +72,13 @@ class HistoryView(generic.ListView):
         # Add in a QuerySet of all the books
         try:
             context['money'] = self.request.user.money_set.get(user=self.request.user.pk)
-            context['today'] = datetime.datetime.now()
+            context['today'] = timezone.now() #datetime.datetime.now()
         except Money.DoesNotExist:
             money = self.request.user.money_set.create()
             money.total = 0
             money.save()
             context['money'] = money
-            context['today'] = datetime.datetime.now()
+            context['today'] = timezone.now() #datetime.datetime.now()
         return context
 
 
@@ -90,6 +90,16 @@ class RechargeView(generic.ListView):
     context_object_name = 'all_money_list'
     def get_queryset(self):
         return Money.objects.all()
+
+    def get_context_data(self, **kwargs):
+        total = 0
+        # Call the base implementation first to get a context
+        context = super(RechargeView, self).get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+	for money in Money.objects.all():
+	    total = total + money.total
+	context['total'] = total
+        return context
         
 def logout_view(request):    
     logout(request)

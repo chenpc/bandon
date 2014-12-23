@@ -3,19 +3,36 @@
 
 {% block content %}
 {% if all_money_list %}
-    <ul>
+    <table class="table">
+    <tr>
+	<td>使用者</td>
+	<td>結餘</td>
+	<td>增減(+/-)</td>
+	<td></td>
+    </tr> 
+    <tr>
     {% for money in all_money_list %}
-    <li><form action="{% url 'menu:change_money' %}" method="post">
+    {% if money.user.is_active %}
+                <form action="{% url 'menu:change_money' %}" method="post">
 		{% csrf_token %}
-		{{money.user}} : [{{money.total}}]
-		<input type="hidden" name="userid" value="{{money.user.pk}}">		
-		<input type="text" name="change_money" value="0">		
-		<input type="submit" value="(+/-)" />
+		<td>{{money.user}} </td>
+		<td>{{money.total}}
+		<input type="hidden" name="userid" value="{{money.user.pk}}"></td>
+		<td><input type="text" name="change_money" value="0"></td>
+		<td><input type="submit" value="加值" /></td>
 	</form>
-	</li>
+	</tr>
         
+    {% endif %}
     {% endfor %}
-    </ul>
+    <tr>
+	<td>結餘</td>
+	<td>{{total}}</td>
+	<td></td>
+	<td></td>
+    </tr> 
+    <tr>
+    </table>
 {% else %}
     <p>No Money are available.</p>
 {% endif %}

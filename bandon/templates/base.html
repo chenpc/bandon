@@ -46,6 +46,8 @@
           		<li><a href="{% url 'menu:index' %}">菜單</a></li>
           		<li><a href="{% url 'history' %}">最近的訂單</a></li>
           		<li><a href="{% url 'log' %}">交易記錄</a></li>
+	                <li><a href="{% url 'menu:menu' %}">新增菜單</a></li>
+			<li>[{{ today }}]</li>
           	</ul>
           	<ul class="nav navbar-nav navbar-right">
           		{% if user.is_staff %}
@@ -54,7 +56,6 @@
 	                <ul class="dropdown-menu">
 	                  <li><a href="/admin/">資料庫</a></li>
 	                  <li><a href="/recharge">儲值</a></li>
-	                  <li><a href="{% url 'menu:menu' %}">新增菜單</a></li>
 	                </ul>
              	</li>
 				{% endif%}
