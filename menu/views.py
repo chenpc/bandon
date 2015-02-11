@@ -58,7 +58,7 @@ class IndexView(generic.ListView):
                 
     def get_queryset(self):
         """Return the last five published polls."""
-        return Menu.objects.order_by('-tickets')
+        return Menu.objects.exclude(tickets=-1).order_by('-tickets')
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super(IndexView, self).get_context_data(**kwargs)
