@@ -8,31 +8,58 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">    
     <title>{% block title %}QNAP訂便當{% endblock %}</title>
-	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
-	
-	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-	<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="{% static 'dist/css/bootstrap.min.css' %}">	
-	
-	<!-- Optional theme -->
-	<link rel="stylesheet" href="{% static 'dist/css/bootstrap-theme.min.css' %}">	
-	<link rel="stylesheet" href="{% static 'signin.css' %}" />	
-	
-	<!-- Latest compiled and minified JavaScript -->
-	<script src="{% static 'dist/js/bootstrap.min.js' %}"></script>
-	<script>
-		$(function() {		
-		$( "#end_time" ).datepicker();
-		});
-	</script>
+    
+    <!-- Latest compiled and minified CSS -->   
+    <link rel="stylesheet" href="{% static 'dist/css/bootstrap.min.css' %}">
+    
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="{% static 'dist/css/bootstrap-theme.min.css' %}">
+    <link rel="stylesheet" href="{% static 'dist/css/datepicker.css' %}">
+    <link rel="stylesheet" href="{% static 'dist/css/bootstrap-datetimepicker.css' %}">  
+    <link rel="stylesheet" href="{% static 'signin.css' %}" />  
+    
+    <!-- Latest compiled and minified JavaScript -->
+    <script type="text/javascript" src="{% static 'dist/js/jquery-2.1.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'dist/js/bootstrap.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'dist/js/moment-with-locales.js' %}"></script>
+    <script type="text/javascript" src="{% static 'dist/js/bootstrap-datetimepicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'dist/js/bootstrap-datepicker.js' %}"></script>
+    
+    <script type="text/javascript">
+        $(function() {
+            //便當日期      
+            $('#order_time').datepicker();
+            
+            //截止時間
+            $('#end_time').datetimepicker({
+                format: 'MM/DD/YYYY HH:mm'
+            });
+
+            //午餐時間
+            var lunchTime = $('#order_time').val() + ' 10:00';
+            $('#end_time').val(moment(lunchTime).format("MM/DD/YYYY HH:mm"));
+            
+            $('input:radio[name="type"]').change(function(){
+                if ($(this).val() == 'dinner') {
+                    //晚餐時間
+                    var dinnerTime = $('#order_time').val() + ' 16:00';
+                    $('#end_time').val(moment(dinnerTime).format("MM/DD/YYYY HH:mm"));
+                }else if($(this).val() == 'launch') {
+                    //午餐時間
+                    var lunchTime = $('#order_time').val() + ' 10:00';
+                    $('#end_time').val(moment(lunchTime).format("MM/DD/YYYY HH:mm"));
+                }
+            });
+        });
+    </script>
+    
 </head>
 
 <body>
     <div id="sidebar" class="container">
-    	{% if user.is_authenticated %}
-    	<div class="navbar navbar-inverse" role="navigation">
-    		<div class="navbar-header">
+        {% if user.is_authenticated %}
+        <div class="navbar navbar-inverse" role="navigation">
+            <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
               <span class="sr-only">Toggle navigation</span>
               <span class="icon-bar"></span>
@@ -42,42 +69,42 @@
             <a class="navbar-brand" href="/">首頁</a>
           </div>
           <div class="navbar-collapse collapse">
-          	<ul class="nav navbar-nav">
-          		<li><a href="{% url 'menu:index' %}">菜單</a></li>
-          		<li><a href="{% url 'history' %}">最近的訂單</a></li>
-          		<li><a href="{% url 'log' %}">交易記錄</a></li>
-	                <li><a href="{% url 'menu:menu' %}">新增菜單</a></li>
-			<li>[{{ today }}]</li>
-          	</ul>
-          	<ul class="nav navbar-nav navbar-right">
-          		{% if user.is_staff %}
-          		<li class="dropdown">
-                	<a href="#" class="dropdown-toggle" data-toggle="dropdown">管理者 <b class="caret"></b></a>
-	                <ul class="dropdown-menu">
-	                  <li><a href="/admin/">資料庫</a></li>
-	                  <li><a href="/recharge">儲值</a></li>
-	                </ul>
-             	</li>
-				{% endif%}
-				{% if money %}          		
-          		<p class="navbar-text">餘額:{{ money.total }}</p>
-          		{% endif %}				
-				<li><a href="{% url 'logout' %}">登出</a></li>
+            <ul class="nav navbar-nav">
+                <li><a href="{% url 'menu:index' %}">菜單</a></li>
+                <li><a href="{% url 'history' %}">最近的訂單</a></li>
+                <li><a href="{% url 'log' %}">交易記錄</a></li>
+                    <li><a href="{% url 'menu:menu' %}">新增菜單</a></li>
+            <li>[{{ today }}]</li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                {% if user.is_staff %}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">管理者 <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                      <li><a href="/admin/">資料庫</a></li>
+                      <li><a href="/recharge">儲值</a></li>
+                    </ul>
+                </li>
+                {% endif%}
+                {% if money %}                  
+                <p class="navbar-text">餘額:{{ money.total }}</p>
+                {% endif %}             
+                <li><a href="{% url 'logout' %}">登出</a></li>
             </ul>
           </div>
-    	</div>
-		{% endif %}
+        </div>
+        {% endif %}
     </div>
    
-	 <div id="content" class="container">
-	 	{% if money %}
-		 	{% if money.total < 0 %}
-				<div class="alert alert-warning alert-dismissable">
-				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-				錢不夠用了，趕快去繳錢！
-				</div>
-			{% endif %}
-		{% endif %}
+     <div id="content" class="container">
+        {% if money %}
+            {% if money.total < 0 %}
+                <div class="alert alert-warning alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                錢不夠用了，趕快去繳錢！
+                </div>
+            {% endif %}
+        {% endif %}
         {% block content %}{% endblock %}
     </div>
 </body>

@@ -27,9 +27,9 @@
 			   </td>
 		       <td><a href="{% url 'menu:buy_list' buy.pk %}">{{buy.get_menu}}</a></td>
 		        {% if buy.type == 0 %}
-			       <td>{{ buy.end_date|date:"m/d"}} 午餐</td>
+			       <td>{{ buy.start_date|date:"m/d"}} 午餐</td>
 		        {% else %}
-			       <td>{{ buy.end_date|date:"m/d"}} 晚餐</td>
+			       <td>{{ buy.start_date|date:"m/d"}} 晚餐</td>
 		        {% endif %}	               
 		       <td>{{buy.comment}}</td>
 		       <td><a href="{% url 'menu:buy' buy.pk %}" class="btn btn-primary" role="button">我要訂</a></td>

@@ -5,10 +5,24 @@
 <form action="{% url 'menu:start_buy' %}" method="post">
 {% csrf_token %}
 <input type="hidden" name="menu_pk" value="{{menu.pk}}">
-<p>截止時間 : <input type="datetime" name="end_time" value="{% now "m/d/Y" %}" id="end_time"/><input type="submit" value="開始團購" /></p>
-<p><input type="radio" name="type" value="launch" checked/>午餐</p>
-<p><input type="radio" name="type" value="dinner"/>晚餐(公司補助80元)</p>
-<p>附註 : <input type="text" name="misc" /></p>
+<!-- <p>日期 : <input type="datetime" name="order_time" value="{% now "m/d/Y" %}" id="order_time"/><input type="submit" value="開始團購" /></p> -->
+
+<p>
+    <div class="container">
+        <div class="row">
+            <div class='col-sm-6'>
+                <label>便當日期 : </label>
+                <input type="datetime" name="order_time" value="{% now "m/d/Y" %}" id="order_time" />
+                <input type="submit" value="開始團購" />
+                <p><input type="radio" name="type" value="launch" checked/>午餐</p>
+                <p><input type="radio" name="type" value="dinner"/>晚餐(公司補助80元)</p>
+                <p>附註 : <input type="text" name="misc" /></p>
+                <label>截止時間 :</label>
+                <input type='datetime' name="end_time" id='end_time'/>
+            </div>
+        </div>
+    </div>
+</p>
 </form>
 <h1>{{ menu.store_name }} : TEL {{ menu.tele_num }}</h1>
 <h2>{{menu.misc}}</h2>
